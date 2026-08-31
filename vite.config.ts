@@ -5,6 +5,9 @@ import {defineConfig} from 'vite';
 
 export default defineConfig(() => {
   return {
+    // GitHub Pages serves this repository from a project sub-path. Local
+    // development keeps using `/` so the standalone app remains convenient.
+    base: process.env.GITHUB_PAGES === 'true' ? '/ethlete-reliable-system/' : '/',
     plugins: [react(), tailwindcss()],
     resolve: {
       alias: {
