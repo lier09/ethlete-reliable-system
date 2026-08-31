@@ -1,0 +1,27 @@
+{
+  "dataset_id": "GOLD-01-HIGH-ICC",
+  "engine": "R-irr-psych-Benchmark-Core",
+  "r_package_equivalent": "irr::icc(ratings, model='twoway', type='agreement', unit='single', conf.level=0.95)",
+  "psych_package_equivalent": "psych::ICC(ratings)$results['ICC2', ]",
+  "results": {
+    "n": 15,
+    "t1_mean": 41.02,
+    "t2_mean": 41.26,
+    "grand_mean": 41.14,
+    "mean_bias": 0.24,
+    "sd_diff": 0.3795,
+    "typical_error": 0.2683,
+    "cv_percent": 0.6522,
+    "pooled_sd": 4.1547,
+    "icc_a1": 0.9944,
+    "icc_a1_lower95": 0.9836,
+    "icc_a1_upper95": 0.9981,
+    "sem": 0.3096,
+    "mdc95": 0.8582,
+    "mdc_percent": 2.086,
+    "loa_lower": -0.5038,
+    "loa_upper": 0.9838
+  },
+  "reference_source": "R irr::icc (twoway, agreement, single) / Weir (2005)",
+  "timestamp": "2026-08-31T04:12:06.748Z"
+}

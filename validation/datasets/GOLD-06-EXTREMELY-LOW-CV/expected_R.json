@@ -1,0 +1,27 @@
+{
+  "dataset_id": "GOLD-06-EXTREMELY-LOW-CV",
+  "engine": "R-irr-psych-Benchmark-Core",
+  "r_package_equivalent": "irr::icc(ratings, model='twoway', type='agreement', unit='single', conf.level=0.95)",
+  "psych_package_equivalent": "psych::ICC(ratings)$results['ICC2', ]",
+  "results": {
+    "n": 10,
+    "t1_mean": 75.89,
+    "t2_mean": 75.91,
+    "grand_mean": 75.9,
+    "mean_bias": 0.02,
+    "sd_diff": 0.1033,
+    "typical_error": 0.073,
+    "cv_percent": 0.0962,
+    "pooled_sd": 5.7392,
+    "icc_a1": 0.9998,
+    "icc_a1_lower95": 0.9994,
+    "icc_a1_upper95": 1,
+    "sem": 0.0707,
+    "mdc95": 0.196,
+    "mdc_percent": 0.258,
+    "loa_lower": -0.1824,
+    "loa_upper": 0.2224
+  },
+  "reference_source": "Hopkins (2000) / Vangel (1996)",
+  "timestamp": "2026-08-31T04:12:06.755Z"
+}

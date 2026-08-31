@@ -1,0 +1,27 @@
+{
+  "dataset_id": "GOLD-03-LOW-ICC",
+  "engine": "R-irr-psych-Benchmark-Core",
+  "r_package_equivalent": "irr::icc(ratings, model='twoway', type='agreement', unit='single', conf.level=0.95)",
+  "psych_package_equivalent": "psych::ICC(ratings)$results['ICC2', ]",
+  "results": {
+    "n": 10,
+    "t1_mean": 13.05,
+    "t2_mean": 13.45,
+    "grand_mean": 13.25,
+    "mean_bias": 0.4,
+    "sd_diff": 2.9981,
+    "typical_error": 2.12,
+    "cv_percent": 16.0001,
+    "pooled_sd": 1.7232,
+    "icc_a1": -0.5865,
+    "icc_a1_lower95": -1,
+    "icc_a1_upper95": 0.138,
+    "sem": 2.1705,
+    "mdc95": 6.0163,
+    "mdc_percent": 45.406,
+    "loa_lower": -5.4763,
+    "loa_upper": 6.2763
+  },
+  "reference_source": "R irr::icc / Shrout & Fleiss (1979)",
+  "timestamp": "2026-08-31T04:12:06.751Z"
+}

@@ -1,0 +1,25 @@
+{
+  "dataset_id": "GOLD-09-SMALL-SAMPLE",
+  "engine": "TypeScript-Statistics-Engine",
+  "version": "1.0.0",
+  "implementation_file": "src/utils/statistics.ts",
+  "results": {
+    "n": 5,
+    "t1_mean": 15,
+    "t2_mean": 15.16,
+    "grand_mean": 15.08,
+    "mean_bias": 0.16000000000000014,
+    "typical_error": 0.2156385865284781,
+    "cv_percent": 1.4299641016477327,
+    "pooled_sd": 2.1671409737255214,
+    "icc_a1": 0.9893617021276605,
+    "icc_a1_lower95": 0.9025943335736931,
+    "icc_a1_upper95": 0.9988866902402653,
+    "sem": 0.2235235243938375,
+    "mdc95": 0.6195642194661194,
+    "mdc_percent": 4.108516044205036,
+    "loa_lower": -0.4377086882090032,
+    "loa_upper": 0.7577086882090035
+  },
+  "timestamp": "2026-08-31T04:12:06.759Z"
+}

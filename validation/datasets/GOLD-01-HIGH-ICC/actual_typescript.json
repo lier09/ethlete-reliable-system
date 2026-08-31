@@ -1,0 +1,25 @@
+{
+  "dataset_id": "GOLD-01-HIGH-ICC",
+  "engine": "TypeScript-Statistics-Engine",
+  "version": "1.0.0",
+  "implementation_file": "src/utils/statistics.ts",
+  "results": {
+    "n": 15,
+    "t1_mean": 41.02,
+    "t2_mean": 41.26,
+    "grand_mean": 41.14,
+    "mean_bias": 0.23999999999999963,
+    "typical_error": 0.26832815729997345,
+    "cv_percent": 0.6522317873115543,
+    "pooled_sd": 4.154687541973352,
+    "icc_a1": 0.9944461891932104,
+    "icc_a1_lower95": 0.9835703257178965,
+    "icc_a1_upper95": 0.998131112168066,
+    "sem": 0.3096234948136644,
+    "mdc95": 0.8582167779110448,
+    "mdc_percent": 2.086088424674392,
+    "loa_lower": -0.5037540446321076,
+    "loa_upper": 0.9837540446321069
+  },
+  "timestamp": "2026-08-31T04:12:06.748Z"
+}

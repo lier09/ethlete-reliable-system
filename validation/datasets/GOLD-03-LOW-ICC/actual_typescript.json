@@ -1,0 +1,25 @@
+{
+  "dataset_id": "GOLD-03-LOW-ICC",
+  "engine": "TypeScript-Statistics-Engine",
+  "version": "1.0.0",
+  "implementation_file": "src/utils/statistics.ts",
+  "results": {
+    "n": 10,
+    "t1_mean": 13.05,
+    "t2_mean": 13.45,
+    "grand_mean": 13.25,
+    "mean_bias": 0.4,
+    "typical_error": 2.120010482154379,
+    "cv_percent": 16.000079110599085,
+    "pooled_sd": 1.7232076034083776,
+    "icc_a1": -0.5865384615384616,
+    "icc_a1_lower95": -1,
+    "icc_a1_upper95": 0.13800996168143703,
+    "sem": 2.170515565600215,
+    "mdc95": 6.01625169380711,
+    "mdc_percent": 45.40567316080838,
+    "loa_lower": -5.476261316109516,
+    "loa_upper": 6.276261316109517
+  },
+  "timestamp": "2026-08-31T04:12:06.751Z"
+}

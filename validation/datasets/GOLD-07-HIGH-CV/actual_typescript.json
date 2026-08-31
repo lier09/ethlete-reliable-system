@@ -1,0 +1,25 @@
+{
+  "dataset_id": "GOLD-07-HIGH-CV",
+  "engine": "TypeScript-Statistics-Engine",
+  "version": "1.0.0",
+  "implementation_file": "src/utils/statistics.ts",
+  "results": {
+    "n": 10,
+    "t1_mean": 3.65,
+    "t2_mean": 3.9200000000000004,
+    "grand_mean": 3.785,
+    "mean_bias": 0.26999999999999996,
+    "typical_error": 1.306415792243121,
+    "cv_percent": 34.51560877788959,
+    "pooled_sd": 1.0944557247021613,
+    "icc_a1": -0.478453904413685,
+    "icc_a1_lower95": -0.9541420271787322,
+    "icc_a1_upper95": 0.25331711631296444,
+    "sem": 1.3307672104855626,
+    "mdc95": 3.6886307617576364,
+    "mdc_percent": 97.453917087388,
+    "loa_lower": -3.3511333138841493,
+    "loa_upper": 3.8911333138841493
+  },
+  "timestamp": "2026-08-31T04:12:06.756Z"
+}

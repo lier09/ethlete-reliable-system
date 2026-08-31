@@ -1,0 +1,25 @@
+{
+  "dataset_id": "GOLD-10-OUTLIER-DATASET",
+  "engine": "TypeScript-Statistics-Engine",
+  "version": "1.0.0",
+  "implementation_file": "src/utils/statistics.ts",
+  "results": {
+    "n": 12,
+    "t1_mean": 50.916666666666664,
+    "t2_mean": 53.666666666666664,
+    "grand_mean": 52.291666666666664,
+    "mean_bias": 2.75,
+    "typical_error": 5.6578585733794755,
+    "cv_percent": 10.819809223992623,
+    "pooled_sd": 5.86043487888885,
+    "icc_a1": 0.06580493537015282,
+    "icc_a1_lower95": -0.47887958531682606,
+    "icc_a1_upper95": 0.5901562545255201,
+    "sem": 5.664331064238616,
+    "mdc95": 15.700436292464996,
+    "mdc_percent": 30.02473872662629,
+    "loa_lower": -12.932495792653981,
+    "loa_upper": 18.43249579265398
+  },
+  "timestamp": "2026-08-31T04:12:06.759Z"
+}

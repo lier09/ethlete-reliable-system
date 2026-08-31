@@ -1,0 +1,42 @@
+{
+  "dataset_id": "GOLD-01-HIGH-ICC",
+  "engine": "Python-Scientific-Validation-Engine",
+  "python_version": "3.10.12",
+  "framework_equivalent": "pingouin.intraclass_corr(targets='participant', raters='session', ratings='val') -> ICC2 (Two-way mixed single absolute agreement)",
+  "model_specification": {
+    "design": "Two-way mixed effects ANOVA",
+    "definition": "Absolute Agreement",
+    "measure": "Single score ICC(A,1)",
+    "ci_method": "McGraw & Wong (1996) exact F-distribution",
+    "sem_method": "Weir (2005) pooled_sd * sqrt(1 - ICC)",
+    "te_method": "Hopkins (2000) sd_diff / sqrt(2)"
+  },
+  "results": {
+    "n": 15,
+    "t1_mean": 41.02,
+    "t2_mean": 41.26,
+    "grand_mean": 41.14,
+    "mean_bias": 0.24,
+    "sd_diff": 0.379473,
+    "typical_error": 0.268328,
+    "cv_percent": 0.652232,
+    "pooled_sd": 4.154688,
+    "icc_a1": 0.994446,
+    "icc_a1_lower95": -0.243114,
+    "icc_a1_upper95": 0.999994,
+    "sem": 0.309623,
+    "mdc95": 0.858233,
+    "mdc_percent": 2.086127,
+    "loa_lower": -0.503768,
+    "loa_upper": 0.983768,
+    "anova_table": {
+      "ms_rows": 34.450857,
+      "ms_cols": 0.432,
+      "ms_error": 0.072,
+      "df_rows": 14,
+      "df_cols": 1,
+      "df_error": 14
+    }
+  },
+  "timestamp": "2026-08-31T04:12:13.260337"
+}

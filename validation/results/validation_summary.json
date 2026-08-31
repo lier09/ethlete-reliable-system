@@ -1,0 +1,708 @@
+{
+  "title": "Gold Standard Independent Cross-Validation Report",
+  "primary_gold_standard": "R (irr version 0.84.1 & psych version 2.4.3)",
+  "secondary_validation_engine": "Python SciPy / Pingouin equivalent implementation",
+  "typescript_engine": "TypeScript statistics.ts v1.0.0",
+  "summary_max_absolute_differences": {
+    "max_icc_point_diff": 0.000048201696092986523,
+    "max_typical_error_diff": 0.0000418412673544033,
+    "max_cv_percent_diff": 0.00003589835226724958,
+    "max_sem_diff": 0.000032789514437414624,
+    "max_mdc95_diff": 0.00004830619289020177,
+    "max_mean_bias_diff": 0.000033333333334439885
+  },
+  "datasets_evaluated": 10,
+  "datasets": [
+    {
+      "dataset_id": "GOLD-01-HIGH-ICC",
+      "metrics": [
+        {
+          "metric": "ICC(A,1)",
+          "typescript": 0.9944461891932104,
+          "r_expected": 0.9944,
+          "python_calculated": 0.994446,
+          "diff_ts_vs_r": 0.00004618919321042192,
+          "diff_ts_vs_python": 1.8919321032040415e-7
+        },
+        {
+          "metric": "Typical Error (TE)",
+          "typescript": 0.26832815729997345,
+          "r_expected": 0.2683,
+          "python_calculated": 0.268328,
+          "diff_ts_vs_r": 0.000028157299973463612,
+          "diff_ts_vs_python": 1.5729997343560953e-7
+        },
+        {
+          "metric": "CV%",
+          "typescript": 0.6522317873115543,
+          "r_expected": 0.6522,
+          "python_calculated": 0.652232,
+          "diff_ts_vs_r": 0.00003178731155428771,
+          "diff_ts_vs_python": 2.1268844574429124e-7
+        },
+        {
+          "metric": "SEM",
+          "typescript": 0.3096234948136644,
+          "r_expected": 0.3096,
+          "python_calculated": 0.309623,
+          "diff_ts_vs_r": 0.000023494813664426406,
+          "diff_ts_vs_python": 4.948136644311596e-7
+        },
+        {
+          "metric": "MDC95",
+          "typescript": 0.8582167779110448,
+          "r_expected": 0.8582,
+          "python_calculated": 0.858233,
+          "diff_ts_vs_r": 0.000016777911044818516,
+          "diff_ts_vs_python": 0.000016222088955242242
+        },
+        {
+          "metric": "Mean Bias",
+          "typescript": 0.23999999999999963,
+          "r_expected": 0.24,
+          "python_calculated": 0.24,
+          "diff_ts_vs_r": 3.608224830031759e-16,
+          "diff_ts_vs_python": 3.608224830031759e-16
+        },
+        {
+          "metric": "SDdiff",
+          "typescript": null,
+          "r_expected": 0.3795,
+          "python_calculated": 0.379473,
+          "diff_ts_vs_r": null,
+          "diff_ts_vs_python": null
+        },
+        {
+          "metric": "Pooled SD",
+          "typescript": 4.154687541973352,
+          "r_expected": 4.1547,
+          "python_calculated": 4.154688,
+          "diff_ts_vs_r": 0.000012458026647621523,
+          "diff_ts_vs_python": 4.5802664772054413e-7
+        }
+      ]
+    },
+    {
+      "dataset_id": "GOLD-02-MODERATE-ICC",
+      "metrics": [
+        {
+          "metric": "ICC(A,1)",
+          "typescript": 0.9640315445277938,
+          "r_expected": 0.964,
+          "python_calculated": 0.964032,
+          "diff_ts_vs_r": 0.000031544527793858634,
+          "diff_ts_vs_python": 4.554722061733685e-7
+        },
+        {
+          "metric": "Typical Error (TE)",
+          "typescript": 1.0112997936948631,
+          "r_expected": 1.0113,
+          "python_calculated": 1.0113,
+          "diff_ts_vs_r": 2.063051369738389e-7,
+          "diff_ts_vs_python": 2.063051369738389e-7
+        },
+        {
+          "metric": "CV%",
+          "typescript": 1.7899111392829434,
+          "r_expected": 1.7899,
+          "python_calculated": 1.789911,
+          "diff_ts_vs_r": 0.000011139282943384288,
+          "diff_ts_vs_python": 1.392829434010423e-7
+        },
+        {
+          "metric": "SEM",
+          "typescript": 1.0300822474104105,
+          "r_expected": 1.0301,
+          "python_calculated": 1.030082,
+          "diff_ts_vs_r": 0.000017752589589470347,
+          "diff_ts_vs_python": 2.4741041060316604e-7
+        },
+        {
+          "metric": "MDC95",
+          "typescript": 2.855189874682972,
+          "r_expected": 2.8552,
+          "python_calculated": 2.855242,
+          "diff_ts_vs_r": 0.000010125317027931402,
+          "diff_ts_vs_python": 0.00005212531702802892
+        },
+        {
+          "metric": "Mean Bias",
+          "typescript": 0.5,
+          "r_expected": 0.5,
+          "python_calculated": 0.5,
+          "diff_ts_vs_r": 0,
+          "diff_ts_vs_python": 0
+        },
+        {
+          "metric": "SDdiff",
+          "typescript": null,
+          "r_expected": 1.4302,
+          "python_calculated": 1.430194,
+          "diff_ts_vs_r": null,
+          "diff_ts_vs_python": null
+        },
+        {
+          "metric": "Pooled SD",
+          "typescript": 5.431390245600108,
+          "r_expected": 5.4314,
+          "python_calculated": 5.43139,
+          "diff_ts_vs_r": 0.000009754399892258903,
+          "diff_ts_vs_python": 2.4560010736252025e-7
+        }
+      ]
+    },
+    {
+      "dataset_id": "GOLD-03-LOW-ICC",
+      "metrics": [
+        {
+          "metric": "ICC(A,1)",
+          "typescript": -0.5865384615384616,
+          "r_expected": -0.5865,
+          "python_calculated": -0.586538,
+          "diff_ts_vs_r": 0.000038461538461542766,
+          "diff_ts_vs_python": 4.6153846156027356e-7
+        },
+        {
+          "metric": "Typical Error (TE)",
+          "typescript": 2.120010482154379,
+          "r_expected": 2.12,
+          "python_calculated": 2.12001,
+          "diff_ts_vs_r": 0.000010482154378710362,
+          "diff_ts_vs_python": 4.821543786448501e-7
+        },
+        {
+          "metric": "CV%",
+          "typescript": 16.000079110599085,
+          "r_expected": 16.0001,
+          "python_calculated": 16.000079,
+          "diff_ts_vs_r": 0.000020889400914825274,
+          "diff_ts_vs_python": 1.1059908544552854e-7
+        },
+        {
+          "metric": "SEM",
+          "typescript": 2.170515565600215,
+          "r_expected": 2.1705,
+          "python_calculated": 2.170516,
+          "diff_ts_vs_r": 0.000015565600214983988,
+          "diff_ts_vs_python": 4.343997850320136e-7
+        },
+        {
+          "metric": "MDC95",
+          "typescript": 6.01625169380711,
+          "r_expected": 6.0163,
+          "python_calculated": 6.016362,
+          "diff_ts_vs_r": 0.00004830619289020177,
+          "diff_ts_vs_python": 0.00011030619288998622
+        },
+        {
+          "metric": "Mean Bias",
+          "typescript": 0.4,
+          "r_expected": 0.4,
+          "python_calculated": 0.4,
+          "diff_ts_vs_r": 0,
+          "diff_ts_vs_python": 0
+        },
+        {
+          "metric": "SDdiff",
+          "typescript": null,
+          "r_expected": 2.9981,
+          "python_calculated": 2.998148,
+          "diff_ts_vs_r": null,
+          "diff_ts_vs_python": null
+        },
+        {
+          "metric": "Pooled SD",
+          "typescript": 1.7232076034083776,
+          "r_expected": 1.7232,
+          "python_calculated": 1.723208,
+          "diff_ts_vs_r": 0.00000760340837757667,
+          "diff_ts_vs_python": 3.965916224313304e-7
+        }
+      ]
+    },
+    {
+      "dataset_id": "GOLD-04-NEGATIVE-ICC",
+      "metrics": [
+        {
+          "metric": "ICC(A,1)",
+          "typescript": -0.04435617345249965,
+          "r_expected": -0.0444,
+          "python_calculated": -0.044356,
+          "diff_ts_vs_r": 0.00004382654750035436,
+          "diff_ts_vs_python": 1.7345249964800802e-7
+        },
+        {
+          "metric": "Typical Error (TE)",
+          "typescript": 4.350861983561418,
+          "r_expected": 4.3509,
+          "python_calculated": 4.350862,
+          "diff_ts_vs_r": 0.00003801643858203363,
+          "diff_ts_vs_python": 1.643858205113702e-8
+        },
+        {
+          "metric": "CV%",
+          "typescript": 21.754309917807092,
+          "r_expected": 21.7543,
+          "python_calculated": 21.75431,
+          "diff_ts_vs_r": 0.000009917807091142095,
+          "diff_ts_vs_python": 8.219290847932825e-8
+        },
+        {
+          "metric": "SEM",
+          "typescript": 4.366914669104795,
+          "r_expected": 4.3669,
+          "python_calculated": 4.366915,
+          "diff_ts_vs_r": 0.000014669104794862164,
+          "diff_ts_vs_python": 3.308952045699698e-7
+        },
+        {
+          "metric": "MDC95",
+          "typescript": 12.104247576518848,
+          "r_expected": 12.1042,
+          "python_calculated": 12.10447,
+          "diff_ts_vs_r": 0.00004757651884723657,
+          "diff_ts_vs_python": 0.00022242348115142363
+        },
+        {
+          "metric": "Mean Bias",
+          "typescript": 0,
+          "r_expected": 0,
+          "python_calculated": 0,
+          "diff_ts_vs_r": 0,
+          "diff_ts_vs_python": 0
+        },
+        {
+          "metric": "SDdiff",
+          "typescript": null,
+          "r_expected": 6.153,
+          "python_calculated": 6.153048,
+          "diff_ts_vs_r": null,
+          "diff_ts_vs_python": null
+        },
+        {
+          "metric": "Pooled SD",
+          "typescript": 4.273172123844299,
+          "r_expected": 4.2732,
+          "python_calculated": 4.273172,
+          "diff_ts_vs_r": 0.000027876155701100913,
+          "diff_ts_vs_python": 1.2384429926015628e-7
+        }
+      ]
+    },
+    {
+      "dataset_id": "GOLD-05-SYSTEMATIC-BIAS",
+      "metrics": [
+        {
+          "metric": "ICC(A,1)",
+          "typescript": 0.3565352402195541,
+          "r_expected": 0.3565,
+          "python_calculated": 0.356535,
+          "diff_ts_vs_r": 0.00003524021955408907,
+          "diff_ts_vs_python": 2.4021955408182194e-7
+        },
+        {
+          "metric": "Typical Error (TE)",
+          "typescript": 0.4727418412673544,
+          "r_expected": 0.4727,
+          "python_calculated": 0.472742,
+          "diff_ts_vs_r": 0.0000418412673544033,
+          "diff_ts_vs_python": 1.5873264558319278e-7
+        },
+        {
+          "metric": "CV%",
+          "typescript": 0.41152717411739226,
+          "r_expected": 0.4115,
+          "python_calculated": 0.411527,
+          "diff_ts_vs_r": 0.00002717411739228126,
+          "diff_ts_vs_python": 1.7411739228201384e-7
+        },
+        {
+          "metric": "SEM",
+          "typescript": 6.315269453777571,
+          "r_expected": 6.3153,
+          "python_calculated": 6.315269,
+          "diff_ts_vs_r": 0.00003054622242881777,
+          "diff_ts_vs_python": 4.5377757107445404e-7
+        },
+        {
+          "metric": "MDC95",
+          "typescript": 17.504712313653013,
+          "r_expected": 17.5047,
+          "python_calculated": 17.505034,
+          "diff_ts_vs_r": 0.000012313653012796522,
+          "diff_ts_vs_python": 0.0003216863469859277
+        },
+        {
+          "metric": "Mean Bias",
+          "typescript": 14.916666666666666,
+          "r_expected": 14.9167,
+          "python_calculated": 14.916667,
+          "diff_ts_vs_r": 0.000033333333334439885,
+          "diff_ts_vs_python": 3.333333342681044e-7
+        },
+        {
+          "metric": "SDdiff",
+          "typescript": null,
+          "r_expected": 0.6686,
+          "python_calculated": 0.668558,
+          "diff_ts_vs_r": null,
+          "diff_ts_vs_python": null
+        },
+        {
+          "metric": "Pooled SD",
+          "typescript": 7.8728051294351635,
+          "r_expected": 7.8728,
+          "python_calculated": 7.872805,
+          "diff_ts_vs_r": 0.000005129435163730989,
+          "diff_ts_vs_python": 1.2943516392027732e-7
+        }
+      ]
+    },
+    {
+      "dataset_id": "GOLD-06-EXTREMELY-LOW-CV",
+      "metrics": [
+        {
+          "metric": "ICC(A,1)",
+          "typescript": 0.999848201696093,
+          "r_expected": 0.9998,
+          "python_calculated": 0.999848,
+          "diff_ts_vs_r": 0.000048201696092986523,
+          "diff_ts_vs_python": 2.016960930495415e-7
+        },
+        {
+          "metric": "Typical Error (TE)",
+          "typescript": 0.07302967433402188,
+          "r_expected": 0.073,
+          "python_calculated": 0.07303,
+          "diff_ts_vs_r": 0.000029674334021886906,
+          "diff_ts_vs_python": 3.256659781153415e-7
+        },
+        {
+          "metric": "CV%",
+          "typescript": 0.09621827975496954,
+          "r_expected": 0.0962,
+          "python_calculated": 0.096218,
+          "diff_ts_vs_r": 0.000018279754969541262,
+          "diff_ts_vs_python": 2.797549695371382e-7
+        },
+        {
+          "metric": "SEM",
+          "typescript": 0.07071103590979251,
+          "r_expected": 0.0707,
+          "python_calculated": 0.070711,
+          "diff_ts_vs_r": 0.000011035909792511678,
+          "diff_ts_vs_python": 3.590979251455462e-8
+        },
+        {
+          "metric": "MDC95",
+          "typescript": 0.19599739172822012,
+          "r_expected": 0.196,
+          "python_calculated": 0.196001,
+          "diff_ts_vs_r": 0.0000026082717798914246,
+          "diff_ts_vs_python": 0.0000036082717798924246
+        },
+        {
+          "metric": "Mean Bias",
+          "typescript": 0.020000000000001704,
+          "r_expected": 0.02,
+          "python_calculated": 0.02,
+          "diff_ts_vs_r": 1.7034984534092246e-15,
+          "diff_ts_vs_python": 1.7034984534092246e-15
+        },
+        {
+          "metric": "SDdiff",
+          "typescript": null,
+          "r_expected": 0.1033,
+          "python_calculated": 0.10328,
+          "diff_ts_vs_r": null,
+          "diff_ts_vs_python": null
+        },
+        {
+          "metric": "Pooled SD",
+          "typescript": 5.739231462293342,
+          "r_expected": 5.7392,
+          "python_calculated": 5.739231,
+          "diff_ts_vs_r": 0.000031462293341277814,
+          "diff_ts_vs_python": 4.62293341385589e-7
+        }
+      ]
+    },
+    {
+      "dataset_id": "GOLD-07-HIGH-CV",
+      "metrics": [
+        {
+          "metric": "ICC(A,1)",
+          "typescript": -0.478453904413685,
+          "r_expected": -0.4785,
+          "python_calculated": -0.478454,
+          "diff_ts_vs_r": 0.0000460955863149648,
+          "diff_ts_vs_python": 9.558631497430525e-8
+        },
+        {
+          "metric": "Typical Error (TE)",
+          "typescript": 1.306415792243121,
+          "r_expected": 1.3064,
+          "python_calculated": 1.306416,
+          "diff_ts_vs_r": 0.000015792243120982263,
+          "diff_ts_vs_python": 2.0775687903373807e-7
+        },
+        {
+          "metric": "CV%",
+          "typescript": 34.51560877788959,
+          "r_expected": 34.5156,
+          "python_calculated": 34.515609,
+          "diff_ts_vs_r": 0.000008777889590305676,
+          "diff_ts_vs_python": 2.2211040828779005e-7
+        },
+        {
+          "metric": "SEM",
+          "typescript": 1.3307672104855626,
+          "r_expected": 1.3308,
+          "python_calculated": 1.330767,
+          "diff_ts_vs_r": 0.000032789514437414624,
+          "diff_ts_vs_python": 2.1048556253511208e-7
+        },
+        {
+          "metric": "MDC95",
+          "typescript": 3.6886307617576364,
+          "r_expected": 3.6886,
+          "python_calculated": 3.688699,
+          "diff_ts_vs_r": 0.00003076175763627731,
+          "diff_ts_vs_python": 0.00006823824236379394
+        },
+        {
+          "metric": "Mean Bias",
+          "typescript": 0.26999999999999996,
+          "r_expected": 0.27,
+          "python_calculated": 0.27,
+          "diff_ts_vs_r": 5.551115123125783e-17,
+          "diff_ts_vs_python": 5.551115123125783e-17
+        },
+        {
+          "metric": "SDdiff",
+          "typescript": null,
+          "r_expected": 1.8476,
+          "python_calculated": 1.847551,
+          "diff_ts_vs_r": null,
+          "diff_ts_vs_python": null
+        },
+        {
+          "metric": "Pooled SD",
+          "typescript": 1.0944557247021613,
+          "r_expected": 1.0945,
+          "python_calculated": 1.094456,
+          "diff_ts_vs_r": 0.00004427529783868067,
+          "diff_ts_vs_python": 2.752978387476901e-7
+        }
+      ]
+    },
+    {
+      "dataset_id": "GOLD-08-ZERO-SDDIFF",
+      "metrics": [
+        {
+          "metric": "ICC(A,1)",
+          "typescript": 0.9868421052631579,
+          "r_expected": 0.9868,
+          "python_calculated": 0.986842,
+          "diff_ts_vs_r": 0.00004210526315784335,
+          "diff_ts_vs_python": 1.052631578568608e-7
+        },
+        {
+          "metric": "Typical Error (TE)",
+          "typescript": 0,
+          "r_expected": 0,
+          "python_calculated": 0,
+          "diff_ts_vs_r": 0,
+          "diff_ts_vs_python": 0
+        },
+        {
+          "metric": "CV%",
+          "typescript": 0,
+          "r_expected": 0,
+          "python_calculated": 0,
+          "diff_ts_vs_r": 0,
+          "diff_ts_vs_python": 0
+        },
+        {
+          "metric": "SEM",
+          "typescript": 1.4048787173725432,
+          "r_expected": 1.4049,
+          "python_calculated": 1.404879,
+          "diff_ts_vs_r": 0.00002128262745682008,
+          "diff_ts_vs_python": 2.8262745677132273e-7
+        },
+        {
+          "metric": "MDC95",
+          "typescript": 3.894053605023954,
+          "r_expected": 3.8941,
+          "python_calculated": 3.894125,
+          "diff_ts_vs_r": 0.0000463949760458604,
+          "diff_ts_vs_python": 0.00007139497604580214
+        },
+        {
+          "metric": "Mean Bias",
+          "typescript": 2,
+          "r_expected": 2,
+          "python_calculated": 2,
+          "diff_ts_vs_r": 0,
+          "diff_ts_vs_python": 0
+        },
+        {
+          "metric": "SDdiff",
+          "typescript": null,
+          "r_expected": 0,
+          "python_calculated": 0,
+          "diff_ts_vs_r": null,
+          "diff_ts_vs_python": null
+        },
+        {
+          "metric": "Pooled SD",
+          "typescript": 12.24744871391589,
+          "r_expected": 12.2474,
+          "python_calculated": 12.247449,
+          "diff_ts_vs_r": 0.00004871391588956442,
+          "diff_ts_vs_python": 2.8608410929109596e-7
+        }
+      ]
+    },
+    {
+      "dataset_id": "GOLD-09-SMALL-SAMPLE",
+      "metrics": [
+        {
+          "metric": "ICC(A,1)",
+          "typescript": 0.9893617021276605,
+          "r_expected": 0.9894,
+          "python_calculated": 0.989362,
+          "diff_ts_vs_r": 0.00003829787233944337,
+          "diff_ts_vs_python": 2.9787233946088065e-7
+        },
+        {
+          "metric": "Typical Error (TE)",
+          "typescript": 0.2156385865284781,
+          "r_expected": 0.2156,
+          "python_calculated": 0.215639,
+          "diff_ts_vs_r": 0.00003858652847807398,
+          "diff_ts_vs_python": 4.134715219095142e-7
+        },
+        {
+          "metric": "CV%",
+          "typescript": 1.4299641016477327,
+          "r_expected": 1.43,
+          "python_calculated": 1.429964,
+          "diff_ts_vs_r": 0.00003589835226724958,
+          "diff_ts_vs_python": 1.0164773267540284e-7
+        },
+        {
+          "metric": "SEM",
+          "typescript": 0.2235235243938375,
+          "r_expected": 0.2235,
+          "python_calculated": 0.223524,
+          "diff_ts_vs_r": 0.00002352439383748739,
+          "diff_ts_vs_python": 4.75606162508857e-7
+        },
+        {
+          "metric": "MDC95",
+          "typescript": 0.6195642194661194,
+          "r_expected": 0.6196,
+          "python_calculated": 0.619576,
+          "diff_ts_vs_r": 0.00003578053388064717,
+          "diff_ts_vs_python": 0.000011780533880623167
+        },
+        {
+          "metric": "Mean Bias",
+          "typescript": 0.16000000000000014,
+          "r_expected": 0.16,
+          "python_calculated": 0.16,
+          "diff_ts_vs_r": 1.3877787807814457e-16,
+          "diff_ts_vs_python": 1.3877787807814457e-16
+        },
+        {
+          "metric": "SDdiff",
+          "typescript": null,
+          "r_expected": 0.305,
+          "python_calculated": 0.304959,
+          "diff_ts_vs_r": null,
+          "diff_ts_vs_python": null
+        },
+        {
+          "metric": "Pooled SD",
+          "typescript": 2.1671409737255214,
+          "r_expected": 2.1671,
+          "python_calculated": 2.167141,
+          "diff_ts_vs_r": 0.00004097372552136491,
+          "diff_ts_vs_python": 2.6274478592824835e-8
+        }
+      ]
+    },
+    {
+      "dataset_id": "GOLD-10-OUTLIER-DATASET",
+      "metrics": [
+        {
+          "metric": "ICC(A,1)",
+          "typescript": 0.06580493537015282,
+          "r_expected": 0.0658,
+          "python_calculated": 0.065805,
+          "diff_ts_vs_r": 0.000004935370152822638,
+          "diff_ts_vs_python": 6.462984718236253e-8
+        },
+        {
+          "metric": "Typical Error (TE)",
+          "typescript": 5.6578585733794755,
+          "r_expected": 5.6579,
+          "python_calculated": 5.657859,
+          "diff_ts_vs_r": 0.000041426620524198654,
+          "diff_ts_vs_python": 4.2662052468500633e-7
+        },
+        {
+          "metric": "CV%",
+          "typescript": 10.819809223992623,
+          "r_expected": 10.8198,
+          "python_calculated": 10.819809,
+          "diff_ts_vs_r": 0.000009223992622153787,
+          "diff_ts_vs_python": 2.2399262356032068e-7
+        },
+        {
+          "metric": "SEM",
+          "typescript": 5.664331064238616,
+          "r_expected": 5.6643,
+          "python_calculated": 5.664331,
+          "diff_ts_vs_r": 0.00003106423861609642,
+          "diff_ts_vs_python": 6.423861620419302e-8
+        },
+        {
+          "metric": "MDC95",
+          "typescript": 15.700436292464996,
+          "r_expected": 15.7004,
+          "python_calculated": 15.700725,
+          "diff_ts_vs_r": 0.00003629246499592398,
+          "diff_ts_vs_python": 0.00028870753500420676
+        },
+        {
+          "metric": "Mean Bias",
+          "typescript": 2.75,
+          "r_expected": 2.75,
+          "python_calculated": 2.75,
+          "diff_ts_vs_r": 0,
+          "diff_ts_vs_python": 0
+        },
+        {
+          "metric": "SDdiff",
+          "typescript": null,
+          "r_expected": 8.0014,
+          "python_calculated": 8.00142,
+          "diff_ts_vs_r": null,
+          "diff_ts_vs_python": null
+        },
+        {
+          "metric": "Pooled SD",
+          "typescript": 5.86043487888885,
+          "r_expected": 5.8604,
+          "python_calculated": 5.860435,
+          "diff_ts_vs_r": 0.00003487888885000956,
+          "diff_ts_vs_python": 1.211111495535988e-7
+        }
+      ]
+    }
+  ],
+  "timestamp": "2026-08-31T04:12:28.950Z"
+}

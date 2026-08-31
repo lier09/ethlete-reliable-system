@@ -1,0 +1,25 @@
+{
+  "dataset_id": "GOLD-08-ZERO-SDDIFF",
+  "engine": "TypeScript-Statistics-Engine",
+  "version": "1.0.0",
+  "implementation_file": "src/utils/statistics.ts",
+  "results": {
+    "n": 8,
+    "t1_mean": 37.5,
+    "t2_mean": 39.5,
+    "grand_mean": 38.5,
+    "mean_bias": 2,
+    "typical_error": 0,
+    "cv_percent": 0,
+    "pooled_sd": 12.24744871391589,
+    "icc_a1": 0.9868421052631579,
+    "icc_a1_lower95": 0.9375595726343824,
+    "icc_a1_upper95": 0.9973377261516729,
+    "sem": 1.4048787173725432,
+    "mdc95": 3.894053605023954,
+    "mdc_percent": 10.114424948114166,
+    "loa_lower": 2,
+    "loa_upper": 2
+  },
+  "timestamp": "2026-08-31T04:12:06.758Z"
+}
