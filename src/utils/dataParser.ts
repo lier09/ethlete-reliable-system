@@ -358,7 +358,7 @@ export function aggregateTrials(
         } else if (direction === 'higher_is_better') {
           return Math.max(...vals);
         } else {
-          return vals.reduce((a, b) => a + b, 0) / vals.length;
+          throw new Error('Neutral metrics do not have a universally defined best value. Please select mean/median or define a custom aggregation rule. (中性指标不存在统一的“最佳值”方向，请选择均值、中位数或自定义聚合规则。)');
         }
       case 'last':
         return vals[vals.length - 1];

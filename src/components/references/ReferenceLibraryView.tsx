@@ -341,7 +341,7 @@ export const ReferenceLibraryView: React.FC<Props> = ({
                 {/* Scientific Disclaimer */}
                 <div className="p-3.5 bg-emerald-50/60 border border-emerald-200 rounded-2xl text-[11px] text-emerald-950 leading-relaxed">
                   <strong>⚖️ 科学范畴界定：</strong>
-                  “推荐用于纵向监控”仅代表该指标在当前测试条件下具有较好的测量可靠性和真实变化检测能力，不等同于证明其具有疲劳、训练适应或专项表现诊断效度。
+                  “推荐用于纵向监控”仅代表该指标在当前测试条件下具有较好的测量可靠性和真实变化检测能力，不等同于证明其具有专项表现或特定生理机制诊断效度。超过MDC仅表示观察到的变化超过预期测量误差，不说明变化的生理或训练原因。
                 </div>
               </div>
 

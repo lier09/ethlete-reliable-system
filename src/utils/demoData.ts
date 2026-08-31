@@ -210,7 +210,7 @@ export const INITIAL_DEMO_REFERENCES: ReliabilityReference[] = [
     analysisMethodVersion: 'v1.0',
     decisionRuleVersion: 'v1.1',
     dataQualityStatus: 'clean',
-    validityDisclaimer: 'Reliability does not establish validity: 本重测信度与MDC95仅证明测试结果在同等条件下的重复一致性与测量噪声水平，并不自动证明该指标能够有效反映专项运动表现、疲劳机理或损伤风险（结构效度/效标效度）。',
+    validityDisclaimer: 'Reliability does not establish validity: 本重测信度与MDC95仅证明测试结果在同等条件下的重复一致性与测量噪声水平，并不自动证明该指标具有专项表现或特定生理机制诊断效度。超过MDC仅表示观察到的变化超过预期测量误差，不说明变化的生理或训练原因。',
     tags: ['测力板', '爆发力', '青训', '高精度']
   },
   {
@@ -273,7 +273,7 @@ export const INITIAL_DEMO_REFERENCES: ReliabilityReference[] = [
     analysisMethodVersion: 'v1.0',
     decisionRuleVersion: 'v1.1',
     dataQualityStatus: 'clean',
-    validityDisclaimer: 'Reliability does not establish validity: 本重测信度与MDC95仅证明测试结果在同等条件下的重复一致性与测量噪声水平，并不自动证明该指标能够有效反映专项运动表现、疲劳机理或损伤风险（结构效度/效标效度）。',
+    validityDisclaimer: 'Reliability does not establish validity: 本重测信度与MDC95仅证明测试结果在同等条件下的重复一致性与测量噪声水平，并不自动证明该指标具有专项表现或特定生理机制诊断效度。超过MDC仅表示观察到的变化超过预期测量误差，不说明变化的生理或训练原因。',
     tags: ['机械功率', '向心推进', '测力板']
   },
   {
@@ -336,7 +336,7 @@ export const INITIAL_DEMO_REFERENCES: ReliabilityReference[] = [
     analysisMethodVersion: 'v1.0',
     decisionRuleVersion: 'v1.1',
     dataQualityStatus: 'clean',
-    validityDisclaimer: 'Reliability does not establish validity: 本重测信度与MDC95仅证明测试结果在同等条件下的重复一致性与测量噪声水平，并不自动证明该指标能够有效反映专项运动表现、疲劳机理或损伤风险（结构效度/效标效度）。',
+    validityDisclaimer: 'Reliability does not establish validity: 本重测信度与MDC95仅证明测试结果在同等条件下的重复一致性与测量噪声水平，并不自动证明该指标具有专项表现或特定生理机制诊断效度。超过MDC仅表示观察到的变化超过预期测量误差，不说明变化的生理或训练原因。',
     tags: ['光电门', '加速能力', '短跑']
   }
 ];

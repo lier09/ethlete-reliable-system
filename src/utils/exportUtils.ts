@@ -191,7 +191,7 @@ export function generatePrintableReportHTML(project: Project, statsMap: Record<s
   <div class="disclaimer">
     <strong>⚠️ 科学解释边界与方法学规范：</strong>
     本系统计算之 MDC95 代表在 95% 置信水平下，个体变化超过预期测试测量误差的临界阈值。
-    运动员纵向测试变化超出 MDC95，只能客观解释为“该变化超过了当前设备协议下的测量噪声”，严禁在无训练负荷与临床评估背景下直接定性为疲劳、机能衰退或专项适应。
+    运动员纵向测试变化超出 MDC95，只能客观解释为“该变化超过了当前设备协议下的测量噪声”，超过MDC仅表示观察到的变化超过预期测量误差，不说明变化的生理或训练原因。
   </div>
 </body>
 </html>`;

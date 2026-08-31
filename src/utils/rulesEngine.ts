@@ -132,12 +132,15 @@ export function evaluateMetricReliability(
   // Layer 1 (Level 1 Core): Absolute Reliability - CV% & 95% CI
   // -------------------------------------------------------------
   let cvStatus: 'pass' | 'caution' | 'fail' = 'pass';
-  const cvPointPass = stats.cvMean <= settings.cvRecommendedCutoff;
-  const cvUpperPass = stats.cvUpper95 <= settings.cvUpperBoundCutoff;
+  const cvIsNaN = !isFinite(stats.cvMean) || isNaN(stats.cvMean);
+  const cvPointPass = !cvIsNaN && stats.cvMean <= settings.cvRecommendedCutoff;
+  const cvUpperPass = !cvIsNaN && isFinite(stats.cvUpper95) && stats.cvUpper95 <= settings.cvUpperBoundCutoff;
   const cvCautionCutoff = settings.cvCautionCutoff ?? 14.0;
   const cvUpperCautionCutoff = settings.cvUpperBoundCaution ?? 18.0;
 
-  if (cvPointPass && cvUpperPass) {
+  if (cvIsNaN) {
+    cvStatus = 'fail';
+  } else if (cvPointPass && cvUpperPass) {
     cvStatus = 'pass';
   } else if (stats.cvMean <= cvCautionCutoff && stats.cvUpper95 <= cvUpperCautionCutoff) {
     cvStatus = 'caution';
@@ -148,11 +151,16 @@ export function evaluateMetricReliability(
   rules.push({
     rule: '[一级核心] 绝对变异度 CV% 均值与95%CI上限',
     passed: cvStatus === 'pass',
-    observedValue: `${formatNum(stats.cvMean, 1)}% [95%CI: ${formatNum(stats.cvLower95, 1)}% ~ ${formatNum(stats.cvUpper95, 1)}%]`,
+    observedValue: cvIsNaN
+      ? 'N/A (指标均值接近0，百分比误差指标不适用)'
+      : `${formatNum(stats.cvMean, 1)}% [95%CI: ${formatNum(stats.cvLower95, 1)}% ~ ${formatNum(stats.cvUpper95, 1)}%]`,
     thresholdValue: `均值 ≤ ${settings.cvRecommendedCutoff}% 且 上限 ≤ ${settings.cvUpperBoundCutoff}%`
   });
 
-  if (stats.cvUpper95 <= 5.0) {
+  if (cvIsNaN) {
+    cautions.push('该指标平均值接近0，百分比变异度 (CV%) 不适用 (N/A)，根据规则无法作为 PASS 参与 Tier 1 准入评定。');
+    reasons.push('CV% 不适用 (均值接近0)');
+  } else if (stats.cvUpper95 <= 5.0) {
     strengths.push(`CV% 95%CI上限极低 (≤5.0%)，绝对测量误差极其微小。`);
     reasons.push('CV% 95%CI上限极低 (≤5.0%)');
   } else if (cvStatus === 'pass') {
@@ -171,10 +179,13 @@ export function evaluateMetricReliability(
   // Heuristic rule: MDC% <= 15% (default configurable screening threshold)
   // -------------------------------------------------------------
   let mdcStatus: 'pass' | 'caution' | 'fail' = 'pass';
+  const mdcIsNaN = !isFinite(stats.mdcPercent) || isNaN(stats.mdcPercent);
   const mdcPassCutoff = settings.mdcPercentCutoff ?? 15.0;
   const mdcCautionCutoff = settings.mdcPercentCaution ?? 25.0;
 
-  if (stats.mdcPercent <= mdcPassCutoff) {
+  if (mdcIsNaN) {
+    mdcStatus = 'fail';
+  } else if (stats.mdcPercent <= mdcPassCutoff) {
     mdcStatus = 'pass';
   } else if (stats.mdcPercent <= mdcCautionCutoff) {
     mdcStatus = 'caution';
@@ -185,11 +196,16 @@ export function evaluateMetricReliability(
   rules.push({
     rule: '[二级核心] 最小可检测真实变化比例 MDC% (默认经验规则)',
     passed: mdcStatus === 'pass',
-    observedValue: `${formatNum(stats.mdcPercent, 1)}% (MDC95 = ±${formatNum(stats.mdc95, 2)} ${stats.unit})`,
+    observedValue: mdcIsNaN
+      ? `N/A (指标均值接近0，百分比指标不适用; MDC95 = ±${formatNum(stats.mdc95, 2)} ${stats.unit})`
+      : `${formatNum(stats.mdcPercent, 1)}% (MDC95 = ±${formatNum(stats.mdc95, 2)} ${stats.unit})`,
     thresholdValue: `≤ ${mdcPassCutoff}% (推荐), ${mdcPassCutoff}%~${mdcCautionCutoff}% (需谨慎), > ${mdcCautionCutoff}% (不推荐)`
   });
 
-  if (mdcStatus === 'pass') {
+  if (mdcIsNaN) {
+    cautions.push('该指标平均值接近0，百分比最小可检测变化 (MDC%) 不适用 (N/A)，根据规则无法作为 PASS 参与 Tier 1 准入评定。');
+    reasons.push('MDC% 不适用 (均值接近0)');
+  } else if (mdcStatus === 'pass') {
     strengths.push(`较低的MDC95和MDC%表明，该指标对超过测量误差的个体变化具有较好的检测能力 (MDC95占均值 ${formatNum(stats.mdcPercent, 1)}% ≤ ${mdcPassCutoff}%)。`);
     reasons.push(`MDC% 充足敏锐 (${formatNum(stats.mdcPercent, 1)}% ≤ ${mdcPassCutoff}%)`);
   } else if (mdcStatus === 'caution') {
@@ -244,7 +260,7 @@ export function evaluateMetricReliability(
     cautions.push(`检测到中度系统偏差 (Bias% = ${formatNum(biasPercent, 2)}% 处于 ${biasPassLimit}%~${biasCautionLimit}% 之间, Bias/MDC95 = ${formatNum(biasToMdcRatio, 2)}, p = ${formatNum(stats.pairedTPValue, 3)})，追踪微小纵向改变时建议结合其他指标。`);
     reasons.push(`中度系统偏差 (Bias% = ${formatNum(biasPercent, 2)}%)`);
   } else {
-    cautions.push(`检测到显著过大的系统偏差 (Bias% = ${formatNum(biasPercent, 2)}% > ${biasCautionLimit}%, p = ${formatNum(stats.pairedTPValue, 3)})，提示可能存在明显的学习效应或测试疲劳。`);
+    cautions.push(`检测到显著过大的系统偏差 (Bias% = ${formatNum(biasPercent, 2)}% > ${biasCautionLimit}%, p = ${formatNum(stats.pairedTPValue, 3)})，提示可能存在明显的熟悉化效应或测试时间间隔影响。`);
     reasons.push(`系统偏差过大 (Bias% = ${formatNum(biasPercent, 2)}% > ${biasCautionLimit}%)`);
   }
 
@@ -296,18 +312,22 @@ export function evaluateMetricReliability(
 
   // 2. CV Score (max 35)
   let cvScore = 0;
-  if (stats.cvMean <= 5.0 && stats.cvUpper95 <= 8.0) cvScore = 35;
-  else if (stats.cvMean <= settings.cvRecommendedCutoff && stats.cvUpper95 <= settings.cvUpperBoundCutoff) cvScore = 30;
-  else if (stats.cvMean <= 14.0 && stats.cvUpper95 <= 18.0) cvScore = 20;
-  else if (stats.cvMean <= 16.0) cvScore = 10;
-  else cvScore = 0;
+  if (!cvIsNaN) {
+    if (stats.cvMean <= 5.0 && stats.cvUpper95 <= 8.0) cvScore = 35;
+    else if (stats.cvMean <= settings.cvRecommendedCutoff && stats.cvUpper95 <= settings.cvUpperBoundCutoff) cvScore = 30;
+    else if (stats.cvMean <= 14.0 && stats.cvUpper95 <= 18.0) cvScore = 20;
+    else if (stats.cvMean <= 16.0) cvScore = 10;
+    else cvScore = 0;
+  }
 
   // 3. MDC% Score (max 15)
   let mdcScore = 0;
-  if (stats.mdcPercent <= 8.0) mdcScore = 15;
-  else if (stats.mdcPercent <= mdcPassCutoff) mdcScore = 12;
-  else if (stats.mdcPercent <= mdcCautionCutoff) mdcScore = 6;
-  else mdcScore = 0;
+  if (!mdcIsNaN) {
+    if (stats.mdcPercent <= 8.0) mdcScore = 15;
+    else if (stats.mdcPercent <= mdcPassCutoff) mdcScore = 12;
+    else if (stats.mdcPercent <= mdcCautionCutoff) mdcScore = 6;
+    else mdcScore = 0;
+  }
 
   // 4. Bias Score (max 10)
   let biasScore = 0;
@@ -363,7 +383,7 @@ export function evaluateMetricReliability(
   }
 
   const summary = `${tierLabel} (规则符合度: ${overallScore}/100)`;
-  const validityDisclaimer = 'Reliability does not establish validity. (较高的测量可靠性并不等同于证明该指标具有专项表现、疲劳或训练适应诊断效度。)';
+  const validityDisclaimer = 'Reliability does not establish validity: 较高的重测信度与MDC95仅证明测试结果在同等条件下的重复一致性与测量噪声水平，并不自动证明该指标具有专项表现、疲劳机理或训练适应诊断效度。超过MDC仅表示观察到的变化超过预期测量误差，不说明变化的生理或训练原因。';
   const methodologicalNote = `P值反映是否存在统计学系统性差异的证据，而系统偏差的实际影响幅度需单独评估 (P value indicates statistical evidence of a systematic difference, but the practical magnitude of the bias is evaluated separately)。信度计算基于 Hopkins (2000) 典型误差 (TE)、Weir (2005) 测量标准误 (SEM) 与 McGraw & Wong (1996) ICC(A,1) 绝对一致性模型。95% 最小可检测变化阈值计算公式为 MDC₉₅ = SEM × 1.96 × √2。${validityDisclaimer}`;
 
   return {
@@ -422,7 +442,7 @@ export function calculateTrueChangeThreshold(
   let resultLabel = '在预期测量误差范围内 (Within Measurement Noise)';
   let resultExplanation = '';
 
-  const contextNote = '变化原因需结合训练负荷、RPE、睡眠、HRV、酸痛和伤病情况解释。';
+  const contextNote = '超过MDC仅表示观察到的变化超过预期测量误差，不说明变化的生理或训练原因。';
 
   if (direction === 'higher_is_better') {
     if (currentValue > upperThreshold) {
@@ -442,11 +462,11 @@ export function calculateTrueChangeThreshold(
     if (currentValue < lowerThreshold) {
       resultType = 'true_improvement';
       resultLabel = '检测到超过预期测量误差的可检测缩短 (Exceeds MDC)';
-      resultExplanation = `检测到超过预期测量误差的可检测升高：实测耗时缩短 ${formatNum(Math.abs(delta), 2)}${unitStr}，超出 95% 最小可检测变化阈值 (MDC₉₅ = ±${formatNum(mdc95, 2)}${unitStr})。${contextNote}`;
+      resultExplanation = `检测到超过预期测量误差的可检测下降 (耗时缩短)：实测值较基线减少 ${formatNum(Math.abs(delta), 2)}${unitStr}，超出 95% 最小可检测变化阈值 (MDC₉₅ = ±${formatNum(mdc95, 2)}${unitStr})。${contextNote}`;
     } else if (currentValue > upperThreshold) {
       resultType = 'true_decline';
       resultLabel = '检测到超过预期测量误差的可检测增加 (Exceeds MDC)';
-      resultExplanation = `检测到超过预期测量误差的可检测下降：实测耗时增加 +${formatNum(delta, 2)}${unitStr}，超出 95% 最小可检测变化阈值 (MDC₉₅ = ±${formatNum(mdc95, 2)}${unitStr})。${contextNote}`;
+      resultExplanation = `检测到超过预期测量误差的可检测升高 (耗时增加)：实测值较基线增加 +${formatNum(delta, 2)}${unitStr}，超出 95% 最小可检测变化阈值 (MDC₉₅ = ±${formatNum(mdc95, 2)}${unitStr})。${contextNote}`;
     } else {
       resultType = 'within_noise';
       resultLabel = '在预期测量误差范围内 (Within Measurement Noise)';

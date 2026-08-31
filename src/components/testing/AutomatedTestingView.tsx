@@ -519,7 +519,7 @@ export const AutomatedTestingView: React.FC = () => {
     // -------------------------------------------------------------
     const tStart21 = performance.now();
     const declineEval = calculateTrueChangeThreshold(40.0, 2.5, 36.0, 'higher_is_better');
-    const requiredPhrase = '变化原因需结合训练负荷、RPE、睡眠、HRV、酸痛和伤病情况解释';
+    const requiredPhrase = '超过MDC仅表示观察到的变化超过预期测量误差，不说明变化的生理或训练原因。';
     const isWordingCompliant =
       declineEval.resultExplanation.includes(requiredPhrase) &&
       !declineEval.resultExplanation.includes('确诊疲劳') &&

@@ -149,7 +149,7 @@ export const QuickVerdictView: React.FC<Props> = ({
       setBaselineInput(base.toFixed(1));
       const delta = currentRef.direction === 'lower_is_better' ? (currentRef.mdc95 * 1.3) : - (currentRef.mdc95 * 1.4);
       setCurrentInput((base + delta).toFixed(1));
-      setNotes('连续三周大负荷，有明显神经肌肉疲劳迹象');
+      setNotes('连续三周大训练负荷记录');
     }
   };
 
@@ -522,17 +522,17 @@ export const QuickVerdictView: React.FC<Props> = ({
                   <div className="text-xs text-blue-950 leading-relaxed">
                     {evalResult.resultType === 'true_improvement' && (
                       <p>
-                        🟢 <strong>突破提升确认：</strong> 实测表现已超出 95% 最小真实变化阈值 (MDC₉₅)，确认为突破测试误差的真实表现提升。具体适应机制可结合阶段负荷及专项测试周期综合解释。
+                        🟢 <strong>可检测升高确认：</strong> 实测表现已超出 95% 最小可检测变化阈值 (MDC₉₅)，确认为突破测试误差的可检测升高。超过MDC仅表示观察到的变化超过预期测量误差，不说明变化的生理或训练原因。
                       </p>
                     )}
                     {evalResult.resultType === 'within_noise' && (
                       <p>
-                        ⚪ <strong>正常误差范围：</strong> 表现波动处于预期测量误差带 (±MDC₉₅) 内，属于日常测试与生物学正常随机波动。不建议据此判定机能改变或盲目调整训练计划。
+                        ⚪ <strong>正常误差范围：</strong> 表现波动处于预期测量误差带 (±MDC₉₅) 内，属于日常测试与生物学正常随机波动。当前变化未超过预期测量误差阈值。
                       </p>
                     )}
                     {evalResult.resultType === 'true_decline' && (
                       <p>
-                        🔴 <strong>真实下降提示：</strong> 检测到超过预期测量误差的真实下降。注意：该变化不代表单一原因诊断，变化原因需结合训练负荷、RPE自觉疲劳度、睡眠质量、HRV心率变异度、肌肉酸痛与伤病情况综合解释。
+                        🔴 <strong>可检测下降提示：</strong> 检测到超过预期测量误差的可检测下降。超过MDC仅表示观察到的变化超过预期测量误差，不说明变化的生理或训练原因。具体研判需结合训练负荷、RPE自觉评分、睡眠质量与临床评估综合研判。
                       </p>
                     )}
                   </div>

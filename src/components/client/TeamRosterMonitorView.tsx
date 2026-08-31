@@ -73,8 +73,8 @@ export const TeamRosterMonitorView: React.FC<Props> = ({
     const declines = monitoringRecords.filter(r => r.resultType === 'true_decline').length;
     const noise = monitoringRecords.filter(r => r.resultType === 'within_noise').length;
     const gainRate = total > 0 ? (improvements / total) * 100 : 0;
-    const fatigueRate = total > 0 ? (declines / total) * 100 : 0;
-    return { total, improvements, declines, noise, gainRate, fatigueRate };
+    const declineRate = total > 0 ? (declines / total) * 100 : 0;
+    return { total, improvements, declines, noise, gainRate, declineRate };
   }, [monitoringRecords]);
 
   return (
@@ -154,7 +154,7 @@ export const TeamRosterMonitorView: React.FC<Props> = ({
         <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-xs border-l-4 border-l-rose-500">
           <div className="text-xs font-bold text-rose-600 uppercase tracking-wider mb-1 flex items-center justify-between">
             <span>🔴 真实超出误差下降</span>
-            <span className="text-xs font-mono">{formatNum(stats.fatigueRate, 0)}%</span>
+            <span className="text-xs font-mono">{formatNum(stats.declineRate, 0)}%</span>
           </div>
           <div className="text-3xl font-bold font-mono text-rose-700">
             {stats.declines} <span className="text-sm font-normal text-rose-600 font-sans">人</span>

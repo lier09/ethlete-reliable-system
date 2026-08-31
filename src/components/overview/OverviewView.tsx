@@ -56,16 +56,16 @@ export const OverviewView: React.FC<Props> = ({
     if (simCurrent > upperThreshold) {
       return {
         type: 'improvement',
-        title: '可检测的真实提升 (True Improvement)',
-        desc: `当前测试值 (${simCurrent} ${unitExample}) 突破了基准误差上界 (>${upperThreshold} ${unitExample})，属于超出正常测试噪声的真实能力提升。`,
+        title: '可检测的真实升高 (True Increase)',
+        desc: `当前测试值 (${simCurrent} ${unitExample}) 突破了基准误差上界 (>${upperThreshold} ${unitExample})，属于超出预期测量误差的可检测升高。超过MDC仅表示观察到的变化超过预期测量误差，不说明变化的生理或训练原因。`,
         color: 'text-emerald-700 bg-emerald-50 border-emerald-200',
         badge: 'bg-emerald-600 text-white'
       };
     } else if (simCurrent < lowerThreshold) {
       return {
         type: 'decline',
-        title: '可检测的真实降低 (True Decline)',
-        desc: `当前测试值 (${simCurrent} ${unitExample}) 突破了基准误差下界 (<${lowerThreshold} ${unitExample})，属于超出正常测试噪声的真实机能衰退。`,
+        title: '可检测的真实下降 (True Decrease)',
+        desc: `当前测试值 (${simCurrent} ${unitExample}) 突破了基准误差下界 (<${lowerThreshold} ${unitExample})，属于超出预期测量误差的可检测下降。超过MDC仅表示观察到的变化超过预期测量误差，不说明变化的生理或训练原因。`,
         color: 'text-rose-700 bg-rose-50 border-rose-200',
         badge: 'bg-rose-600 text-white'
       };

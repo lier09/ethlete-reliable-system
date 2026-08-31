@@ -298,7 +298,7 @@ export const ReliabilityLabView: React.FC<Props> = ({
       analysisMethodVersion: settings.analysisMethodVersion || 'v1.0',
       decisionRuleVersion: settings.decisionRuleVersion || 'v1.1',
       dataQualityStatus: 'clean',
-      validityDisclaimer: activeEvaluation.validityDisclaimer || 'Reliability does not establish validity: 本重测信度与MDC95仅证明测试结果在同等条件下的重复一致性与测量噪声水平，并不自动证明该指标能够有效反映专项运动表现、疲劳机理或损伤风险（结构效度/效标效度）。',
+      validityDisclaimer: activeEvaluation.validityDisclaimer || 'Reliability does not establish validity: 本重测信度与MDC95仅证明测试结果在同等条件下的重复一致性与测量噪声水平，并不自动证明该指标具有专项表现或特定生理状态诊断效度。超过MDC仅表示观察到的变化超过预期测量误差，不说明变化的生理或训练原因。',
       thresholdConfigSnapshot: {
         minCohortSize: settings.minCohortSize,
         iccRecommendedCutoff: settings.iccRecommendedCutoff,
@@ -1206,7 +1206,7 @@ export const ReliabilityLabView: React.FC<Props> = ({
                   {/* Scientific Disclaimer (Item 12) */}
                   <div className="p-3 bg-white/85 rounded-lg border border-current/20 text-[11px] leading-relaxed text-slate-700">
                     <strong>⚖️ 科学免责与范畴边界 (Scientific Scope Disclaimer)：</strong>
-                    “推荐用于纵向监控”仅表示该指标在当前测试条件下具有较好的测量可靠性和真实变化检测能力，不等同于证明其具有疲劳、训练适应或专项表现诊断效度。实际应用中应结合运动专项需求与先验背景综合判断。
+                    “推荐用于纵向监控”仅表示该指标在当前测试条件下具有较好的测量可靠性和真实变化检测能力，不等同于证明其具有专项表现或特定生理机制诊断效度。超过MDC仅表示观察到的变化超过预期测量误差，不说明变化的生理或训练原因。
                   </div>
 
                   {/* Tier 2 Caution Warning Banner if applicable */}

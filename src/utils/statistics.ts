@@ -359,7 +359,7 @@ export function calculateBias(
   } else if (biasPercent <= 5.0) {
     biasEvaluation = 'caution';
     biasNote = hasSignificantBias
-      ? 'Statistically significant and moderate systematic bias (2%~5%) (中度系统偏差，可能存在学习效应或疲劳残留)'
+      ? 'Statistically significant and moderate systematic bias (2%~5%) (中度系统偏差，可能存在熟悉化效应或测试间隔影响)'
       : 'Moderate systematic bias without strong statistical significance (2%~5%) (中度系统偏差)';
   } else {
     biasEvaluation = 'fail';
@@ -701,9 +701,13 @@ export function calculateMDC95(
 /**
  * 2.11 Calculate MDC% (Sensitivity)
  * MDC% = (MDC / pooled_mean) * 100
+ * When abs(pooled_mean) < epsilon, returns NaN (not 0), indicating percentage metric is not applicable.
  */
 export function calculateMDCPercent(mdc: number, pooledMean: number): number {
-  return isFinite(pooledMean) && pooledMean !== 0 ? (mdc / Math.abs(pooledMean)) * 100 : 0;
+  if (!isFinite(pooledMean) || Math.abs(pooledMean) < 1e-6 || !isFinite(mdc) || mdc < 0) {
+    return NaN;
+  }
+  return (mdc / Math.abs(pooledMean)) * 100;
 }
 
 /**

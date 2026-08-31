@@ -533,7 +533,7 @@ export const AthleteMonitorView: React.FC<Props> = ({
                   科学解释边界 (Methodological Interpretation Boundary)
                 </div>
                 <p className="text-[11px] leading-relaxed">
-                  “超过 MDC95 表示观察到的测试变化超过了当前协议下的预期测量误差（p &lt; 0.05），但不自动说明变化原因或实际重要性。严禁直接定性为疲劳、损伤或适应，必须结合训练负荷与主观状态综合研判。”
+                  “超过 MDC95 表示观察到的测试变化超过了 95% 最小可检测变化阈值 (Change exceeds the 95% minimum detectable change threshold)，但不自动说明变化原因或实际重要性。超过MDC仅表示观察到的变化超过预期测量误差，不说明变化的生理或训练原因。严禁直接定性为特定生理状态，必须结合训练负荷与主观状态综合研判。”
                 </p>
               </div>
             </div>

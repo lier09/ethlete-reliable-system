@@ -152,8 +152,46 @@ describe('Rules Engine & Interpretation Boundary Tests', () => {
     const result = calculateTrueChangeThreshold(40, 2.5, 45, 'higher_is_better', 'cm');
     expect(result.resultType).toBe('true_improvement');
     expect(result.resultLabel).toContain('可检测升高');
-    expect(result.resultExplanation).toContain('需结合训练负荷');
+    expect(result.resultExplanation).toContain('超过MDC仅表示观察到的变化超过预期测量误差，不说明变化的生理或训练原因');
     expect(result.resultExplanation).not.toContain('疲劳程度');
     expect(result.resultExplanation).not.toContain('伤病恢复完成');
+  });
+
+  it('Verifies near-zero pooled mean returns NaN for CV and MDC% and fails Tier 1 qualification', () => {
+    const cvResult = calculateCV(0.5, 0.0000001, 20);
+    expect(isNaN(cvResult.cvMean)).toBe(true);
+    expect(isNaN(cvResult.cvUpper95)).toBe(true);
+
+    const mdcPercent = calculateMDCPercent(1.38, 0.0000001);
+    expect(isNaN(mdcPercent)).toBe(true);
+
+    const statsNearZero = calculateReliability(
+      [
+        { participantId: 'P1', name: 'P1', test1: -0.05, test2: 0.05, diff: 0.1, mean: 0.0 },
+        { participantId: 'P2', name: 'P2', test1: 0.03, test2: -0.03, diff: -0.06, mean: 0.0 },
+        { participantId: 'P3', name: 'P3', test1: -0.02, test2: 0.02, diff: 0.04, mean: 0.0 },
+        { participantId: 'P4', name: 'P4', test1: 0.04, test2: -0.04, diff: -0.08, mean: 0.0 }
+      ],
+      'M_ZERO',
+      'Zero Mean Deviation',
+      'deg'
+    );
+
+    const evalResult = evaluateMetricReliability(statsNearZero);
+    expect(evalResult.tier).not.toBe('tier_1_recommended');
+    expect(evalResult.isEligibleForReference).toBe(false);
+  });
+
+  it('Verifies neutral direction prohibits best aggregation and throws error', () => {
+    const testRows = [
+      { participant_id: 'P1', session: 1, trial: 1, metric: 'Angle', value: 10 },
+      { participant_id: 'P1', session: 1, trial: 2, metric: 'Angle', value: 12 },
+      { participant_id: 'P1', session: 2, trial: 1, metric: 'Angle', value: 11 },
+      { participant_id: 'P1', session: 2, trial: 2, metric: 'Angle', value: 13 }
+    ];
+
+    expect(() => {
+      aggregateTrials(testRows, 'Angle', 'best', 'neutral', 1, 2);
+    }).toThrow(/Neutral metrics do not have a universally defined best value/);
   });
 });
