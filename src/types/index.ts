@@ -32,7 +32,7 @@ export interface RawDataRow {
   name?: string;
   age?: number;
   sex?: string;
-  session: number; // 1 or 2
+  session: number; // 1, 2, 3...
   trial: number;   // 1, 2, 3...
   metric: string;
   value: number;
@@ -47,6 +47,16 @@ export interface AggregatedPairData {
   mean: number; // (test1 + test2) / 2
 }
 
+export interface ParseErrorDetail {
+  line: number;
+  participant_id?: string;
+  session?: number | string;
+  trial?: number | string;
+  metric?: string;
+  reason: string;
+  rawContent?: string;
+}
+
 export interface QualificationIssue {
   type: 'error' | 'warning' | 'info';
   code: string;
@@ -59,11 +69,18 @@ export interface DataQualificationResult {
   canProceedToReliability: boolean;
   totalParticipants: number;
   sessionCount: number;
+  availableSessions: number[];
+  selectedSessionA: number;
+  selectedSessionB: number;
   trialCountPerSession: number;
+  expectedTrialsPerSession?: number;
   metricsFound: string[];
   pairedCountByMetric: Record<string, number>;
   issues: QualificationIssue[];
   isSingleParticipantError: boolean;
+  parseErrors: ParseErrorDetail[];
+  ignoredRowsCount: number;
+  isExpertOverrideActive?: boolean;
   notes: string[];
 }
 
@@ -73,6 +90,8 @@ export interface ReliabilityStats {
   unit: string;
   direction: MetricDirection;
   n: number;
+  // Sessions Compared
+  sessionsCompared: [number, number];
   // Test 1 & Test 2
   t1Mean: number;
   t1SD: number;
@@ -98,6 +117,7 @@ export interface ReliabilityStats {
   iccModel: 'two_way_mixed';
   iccDefinition: 'absolute_agreement' | 'consistency';
   iccMeasureType: 'single';
+  iccCiMethod: 'mcgraw_wong_1996';
   iccA1: number; // Two-way mixed, single measure, absolute agreement
   iccA1Lower95: number;
   iccA1Upper95: number;
@@ -109,6 +129,7 @@ export interface ReliabilityStats {
   typicalErrorLower95: number;
   typicalErrorUpper95: number;
   teMethod: 'sd_diff_div_sqrt2';
+  teCiMethod: 'exact_chi_square';
   // Standard Error of Measurement (SEM)
   sem: number; // pooled_SD * sqrt(1 - iccA1)
   semMethod: 'pooled_sd_sqrt_1_minus_icc';
@@ -117,14 +138,15 @@ export interface ReliabilityStats {
   cvLower95: number;
   cvUpper95: number;
   cvMethod: 'te_div_pooled_mean';
+  cvCiMethod: 'vangel_mckay_approx';
   // Minimum Detectable Change (MDC95/MDC90) & MDC%
   mdcConfidenceLevel: 90 | 95;
   mdc95: number; // SEM * z * sqrt(2)
   mdcPercent: number; // (MDC / grandMean) * 100
   mdcMethod: 'sem_times_z_times_sqrt2';
   // Bland-Altman
-  loaLower: number; // meanBias - 1.96 * biasSD
-  loaUpper: number; // meanBias + 1.96 * biasSD
+  loaLower: number; // meanBias - z * biasSD
+  loaUpper: number; // meanBias + z * biasSD
   loaLowerCILower: number;
   loaLowerCIUpper: number;
   loaUpperCILower: number;
@@ -155,11 +177,14 @@ export interface SuitabilityEvaluation {
     thresholdValue: string;
   }[];
   methodologicalNote: string;
+  validityDisclaimer: string;
 }
 
 export interface ReliabilityReference {
   id: string; // REF-2026-XXXX
   version: number;
+  versionTag: string; // 'v1.0', 'v2.0'
+  previousVersionId?: string;
   name: string;
   createdAt: string;
   updatedAt: string;
@@ -174,16 +199,19 @@ export interface ReliabilityReference {
   direction: MetricDirection;
   device: string;
   protocol: string;
+  population: string;
   cohortDescription: string;
   sampleSize: number;
   sessionInterval: string;
   sessionsCount: number;
+  sessionsCompared: [number, number];
   trialsPerSession: number;
   trialAggregation: TrialAggregationMethod;
   // ICC Metadata & Values
   iccModel: string; // 'two_way_mixed'
   iccDefinition: string; // 'absolute_agreement'
   iccMeasureType: string; // 'single'
+  iccCiMethod: string; // 'mcgraw_wong_1996'
   iccA1: number;
   iccA1CI: [number, number];
   iccC1?: number;
@@ -192,6 +220,7 @@ export interface ReliabilityReference {
   typicalError: number;
   // CV%
   cvMethod: string; // 'te_div_pooled_mean'
+  cvCiMethod: string; // 'vangel_mckay_approx'
   cv: number;
   cvCI: [number, number];
   // Bias
@@ -224,6 +253,9 @@ export interface ReliabilityReference {
   analysisMethodVersion: string; // 'v1.0'
   decisionRuleVersion?: string; // 'v1.1'
   thresholdConfigSnapshot?: Record<string, any>;
+  dataQualityStatus: 'clean' | 'parsed_with_warnings';
+  dataQualityWarnings?: string[];
+  validityDisclaimer: string;
   tags?: string[];
   notes?: string;
 }
@@ -240,6 +272,7 @@ export interface AthleteMonitoringRecord {
   athleteName: string;
   date: string;
   referenceId: string;
+  referenceVersion?: number;
   referenceName: string;
   metricName: string;
   unit: string;
@@ -265,11 +298,14 @@ export interface Project {
   testName: string;
   device: string;
   protocol: string;
+  population?: string;
   testInterval: string;
   cohortDescription: string;
   sessionCount: number;
   trialCount: number;
   aggregationMethod: TrialAggregationMethod;
+  selectedSessionA?: number;
+  selectedSessionB?: number;
   notes: string;
   createdAt: string;
   updatedAt: string;
@@ -313,3 +349,4 @@ export interface AuditLogEntry {
   description: string;
   user: string;
 }
+

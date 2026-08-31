@@ -759,7 +759,8 @@ export function calculateReliability(
   metricName: string,
   unit: string,
   direction: MetricDirection = 'higher_is_better',
-  confidenceLevel: 90 | 95 = 95
+  confidenceLevel: 90 | 95 = 95,
+  sessionsCompared: [number, number] = [1, 2]
 ): ReliabilityStats {
   const n = pairs.length;
   if (n < 2) {
@@ -814,6 +815,7 @@ export function calculateReliability(
     unit,
     direction,
     n,
+    sessionsCompared,
     t1Mean,
     t1SD,
     t2Mean,
@@ -836,6 +838,7 @@ export function calculateReliability(
     iccModel: iccStats.iccModel,
     iccDefinition: iccStats.iccDefinition,
     iccMeasureType: iccStats.iccMeasureType,
+    iccCiMethod: 'mcgraw_wong_1996',
     iccA1: iccStats.iccA1,
     iccA1Lower95: iccStats.iccA1Lower95,
     iccA1Upper95: iccStats.iccA1Upper95,
@@ -846,12 +849,14 @@ export function calculateReliability(
     typicalErrorLower95: teStats.typicalErrorLower95,
     typicalErrorUpper95: teStats.typicalErrorUpper95,
     teMethod: teStats.teMethod,
+    teCiMethod: 'exact_chi_square',
     sem: semStats.sem,
     semMethod: semStats.semMethod,
     cvMean: cvStats.cvMean,
     cvLower95: cvStats.cvLower95,
     cvUpper95: cvStats.cvUpper95,
     cvMethod: cvStats.cvMethod,
+    cvCiMethod: 'vangel_mckay_approx',
     mdcConfidenceLevel: mdcStats.mdcConfidenceLevel,
     mdc95: mdcStats.mdc95,
     mdcPercent,

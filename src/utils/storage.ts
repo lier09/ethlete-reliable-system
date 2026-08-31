@@ -148,7 +148,7 @@ export function initializeStorage() {
   }
 }
 
-// Storage Operations
+// Storage Operations with Version Chain & Provenance Tracking
 export function loadProjects(): Project[] {
   initializeStorage();
   try {
@@ -226,16 +226,56 @@ export function getReferences(): ReliabilityReference[] {
   return loadReferences();
 }
 
-export function saveReference(ref: ReliabilityReference): void {
+/**
+ * Saves a Reliability Reference with automatic version chain tracking (v1, v2, v3).
+ * If a reference with the same metricId & projectId already exists, creates a new version
+ * and links previousVersionId.
+ */
+export function saveReference(ref: ReliabilityReference): ReliabilityReference {
   const refs = loadReferences();
+  const existingSameMetric = refs.filter(r => r.metricId === ref.metricId && r.projectId === ref.projectId);
+
+  let version = ref.version || 1;
+  let previousVersionId = ref.previousVersionId;
+
+  if (existingSameMetric.length > 0 && !refs.some(r => r.id === ref.id)) {
+    const highestVersion = Math.max(...existingSameMetric.map(r => r.version || 1));
+    version = highestVersion + 1;
+    const latestExisting = existingSameMetric.sort((a, b) => (b.version || 1) - (a.version || 1))[0];
+    previousVersionId = latestExisting.id;
+    // Mark previous versions as archived/superseded if active
+    if (latestExisting.status === 'active') {
+      latestExisting.status = 'deprecated';
+      latestExisting.updatedAt = new Date().toISOString();
+    }
+  }
+
+  const versionTag = ref.versionTag || `v${version}.0`;
+
+  const updatedRef: ReliabilityReference = {
+    ...ref,
+    version,
+    versionTag,
+    previousVersionId,
+    createdAt: ref.createdAt || new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  };
+
   const idx = refs.findIndex(r => r.id === ref.id);
   if (idx >= 0) {
-    refs[idx] = { ...ref, updatedAt: new Date().toISOString() };
+    refs[idx] = updatedRef;
   } else {
-    refs.unshift({ ...ref, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() });
+    refs.unshift(updatedRef);
   }
+
   saveReferences(refs);
-  addAuditLog('SAVE_REFERENCE', 'reference', ref.id, `固化并建立 Reliability Reference: ${ref.name} (MDC95 = ${ref.mdc95} ${ref.unit})`);
+  addAuditLog(
+    'SAVE_REFERENCE',
+    'reference',
+    updatedRef.id,
+    `固化并建立 Reliability Reference (${versionTag}): ${updatedRef.name} [MDC95 = ±${updatedRef.mdc95} ${updatedRef.unit}]`
+  );
+  return updatedRef;
 }
 
 export function deprecateReference(id: string): void {
@@ -245,7 +285,7 @@ export function deprecateReference(id: string): void {
     target.status = 'deprecated';
     target.updatedAt = new Date().toISOString();
     saveReferences(refs);
-    addAuditLog('DEPRECATE_REFERENCE', 'reference', id, `停用 Reliability Reference: ${target.name}`);
+    addAuditLog('DEPRECATE_REFERENCE', 'reference', id, `停用 Reliability Reference: ${target.name} (${target.versionTag || 'v1.0'})`);
   }
 }
 
@@ -324,6 +364,37 @@ export function addAuditLog(action: string, entityType: AuditLogEntry['entityTyp
     console.error('Audit log error', e);
   }
 }
+
+// Storage Service Interface for Clean Architecture & Future Backend Migration
+export interface IStorageService {
+  getProjects(): Project[];
+  saveProject(project: Project): void;
+  deleteProject(id: string): void;
+  getReferences(): ReliabilityReference[];
+  saveReference(ref: ReliabilityReference): ReliabilityReference;
+  deprecateReference(id: string): void;
+  getMonitoringRecords(): AthleteMonitoringRecord[];
+  saveMonitoringRecord(record: AthleteMonitoringRecord): void;
+  deleteMonitoringRecord(id: string): void;
+  getSettings(): SystemSettings;
+  saveSettings(settings: SystemSettings): void;
+  getAuditLogs(): AuditLogEntry[];
+}
+
+export const LocalStorageService: IStorageService = {
+  getProjects,
+  saveProject,
+  deleteProject,
+  getReferences,
+  saveReference,
+  deprecateReference,
+  getMonitoringRecords,
+  saveMonitoringRecord,
+  deleteMonitoringRecord,
+  getSettings,
+  saveSettings,
+  getAuditLogs
+};
 
 export function resetToDefaultSeeds() {
   localStorage.removeItem(STORAGE_KEYS.PROJECTS);

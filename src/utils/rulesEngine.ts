@@ -363,7 +363,8 @@ export function evaluateMetricReliability(
   }
 
   const summary = `${tierLabel} (规则符合度: ${overallScore}/100)`;
-  const methodologicalNote = `P值反映是否存在统计学系统性差异的证据，而系统偏差的实际影响幅度需单独评估 (P value indicates statistical evidence of a systematic difference, but the practical magnitude of the bias is evaluated separately)。信度计算基于 Hopkins (2000) 典型误差 (TE)、Weir (2005) 测量标准误 (SEM) 与 McGraw & Wong (1996) ICC(A,1) 绝对一致性模型。95% 最小真实变化阈值计算公式为 MDC₉₅ = SEM × 1.96 × √2。`;
+  const validityDisclaimer = 'Reliability does not establish validity. (较高的测量可靠性并不等同于证明该指标具有专项表现、疲劳或训练适应诊断效度。)';
+  const methodologicalNote = `P值反映是否存在统计学系统性差异的证据，而系统偏差的实际影响幅度需单独评估 (P value indicates statistical evidence of a systematic difference, but the practical magnitude of the bias is evaluated separately)。信度计算基于 Hopkins (2000) 典型误差 (TE)、Weir (2005) 测量标准误 (SEM) 与 McGraw & Wong (1996) ICC(A,1) 绝对一致性模型。95% 最小可检测变化阈值计算公式为 MDC₉₅ = SEM × 1.96 × √2。${validityDisclaimer}`;
 
   return {
     metricId: stats.metricId,
@@ -379,7 +380,8 @@ export function evaluateMetricReliability(
     strengths,
     cautions,
     decisionRulesTriggered: rules,
-    methodologicalNote
+    methodologicalNote,
+    validityDisclaimer
   };
 }
 
@@ -393,13 +395,14 @@ export const evaluateSuitability = evaluateMetricReliability;
  *
  * Strict Interpretation Rule:
  * MDC only determines whether the observed change exceeds expected measurement error.
- * It does NOT automatically assert physiological adaptation, fatigue, or injury.
+ * It does NOT automatically assert physiological adaptation, fatigue, recovery failure, or injury.
  */
 export function calculateTrueChangeThreshold(
   baselineValue: number,
   mdc95: number,
   currentValue: number,
-  direction: MetricDirection = 'higher_is_better'
+  direction: MetricDirection = 'higher_is_better',
+  unit: string = ''
 ): {
   upperThreshold: number;
   lowerThreshold: number;
@@ -413,53 +416,56 @@ export function calculateTrueChangeThreshold(
   const deltaPercent = baselineValue !== 0 ? (delta / baselineValue) * 100 : 0;
   const upperThreshold = baselineValue + mdc95;
   const lowerThreshold = baselineValue - mdc95;
+  const unitStr = unit ? ` ${unit}` : '';
 
   let resultType: TrueChangeResultType = 'within_noise';
-  let resultLabel = '在正常测量噪声范围内 (Within Measurement Error)';
+  let resultLabel = '在预期测量误差范围内 (Within Measurement Noise)';
   let resultExplanation = '';
+
+  const contextNote = '变化原因需结合训练负荷、RPE、睡眠、HRV、酸痛和伤病情况解释。';
 
   if (direction === 'higher_is_better') {
     if (currentValue > upperThreshold) {
       resultType = 'true_improvement';
-      resultLabel = '真实升高 / 表现提升 (True Improvement)';
-      resultExplanation = `检测到超过预期测量误差的真实提升：实测值较基准提升 +${formatNum(delta, 2)}，超出 95% 最小真实变化阈值 (MDC₉₅ = ±${formatNum(mdc95, 2)})。确认为突破测试噪声的表现提升。`;
+      resultLabel = '检测到超过预期测量误差的可检测升高 (Exceeds MDC)';
+      resultExplanation = `检测到超过预期测量误差的可检测升高：实测值较基线提升 +${formatNum(delta, 2)}${unitStr}，超出 95% 最小可检测变化阈值 (MDC₉₅ = ±${formatNum(mdc95, 2)}${unitStr})。${contextNote}`;
     } else if (currentValue < lowerThreshold) {
       resultType = 'true_decline';
-      resultLabel = '真实下降 / 跌破误差下限 (True Decline)';
-      resultExplanation = `检测到超过预期测量误差的真实下降：实测值较基准下降 ${formatNum(Math.abs(delta), 2)}，跌破 95% 最小真实变化下限 (MDC₉₅ = ±${formatNum(mdc95, 2)})。变化原因需结合训练负荷、RPE、睡眠、HRV、酸痛和伤病情况解释。`;
+      resultLabel = '检测到超过预期测量误差的可检测下降 (Exceeds MDC)';
+      resultExplanation = `检测到超过预期测量误差的可检测下降：实测值较基线下降 ${formatNum(Math.abs(delta), 2)}${unitStr}，跌破 95% 最小可检测变化下限 (MDC₉₅ = ±${formatNum(mdc95, 2)}${unitStr})。${contextNote}`;
     } else {
       resultType = 'within_noise';
       resultLabel = '在预期测量误差范围内 (Within Measurement Noise)';
-      resultExplanation = `变化量 (${delta >= 0 ? '+' : ''}${formatNum(delta, 2)}) 处于 95% 最小真实变化阈值 (±${formatNum(mdc95, 2)}) 范围内。该波动属于预期测量误差与日常生物学正常波动，尚不能确认为真实机能改变。`;
+      resultExplanation = `当前变化 (${delta >= 0 ? '+' : ''}${formatNum(delta, 2)}${unitStr}) 未超过 95% 最小可检测变化阈值 (±${formatNum(mdc95, 2)}${unitStr})，属于预期测量误差与日常生物学正常波动。`;
     }
   } else if (direction === 'lower_is_better') {
     if (currentValue < lowerThreshold) {
       resultType = 'true_improvement';
-      resultLabel = '真实缩短 / 表现提升 (True Improvement)';
-      resultExplanation = `检测到超过预期测量误差的真实提升：实测用时/数值缩短 ${formatNum(Math.abs(delta), 2)}，超出 95% 最小真实变化阈值 (MDC₉₅ = ±${formatNum(mdc95, 2)})。确认为突破测试噪声的表现提升。`;
+      resultLabel = '检测到超过预期测量误差的可检测缩短 (Exceeds MDC)';
+      resultExplanation = `检测到超过预期测量误差的可检测升高：实测耗时缩短 ${formatNum(Math.abs(delta), 2)}${unitStr}，超出 95% 最小可检测变化阈值 (MDC₉₅ = ±${formatNum(mdc95, 2)}${unitStr})。${contextNote}`;
     } else if (currentValue > upperThreshold) {
       resultType = 'true_decline';
-      resultLabel = '真实增加 / 跌破误差下限 (True Decline)';
-      resultExplanation = `检测到超过预期测量误差的真实下降：实测用时/数值增加 +${formatNum(delta, 2)}，超出 95% 误差阈值 (MDC₉₅ = ±${formatNum(mdc95, 2)})。变化原因需结合训练负荷、RPE、睡眠、HRV、酸痛和伤病情况解释。`;
+      resultLabel = '检测到超过预期测量误差的可检测增加 (Exceeds MDC)';
+      resultExplanation = `检测到超过预期测量误差的可检测下降：实测耗时增加 +${formatNum(delta, 2)}${unitStr}，超出 95% 最小可检测变化阈值 (MDC₉₅ = ±${formatNum(mdc95, 2)}${unitStr})。${contextNote}`;
     } else {
       resultType = 'within_noise';
       resultLabel = '在预期测量误差范围内 (Within Measurement Noise)';
-      resultExplanation = `变化量 (${delta >= 0 ? '+' : ''}${formatNum(delta, 2)}) 处于预期测量误差 (±${formatNum(mdc95, 2)}) 范围之内，属于正常测试波动。`;
+      resultExplanation = `当前变化 (${delta >= 0 ? '+' : ''}${formatNum(delta, 2)}${unitStr}) 未超过 95% 最小可检测变化阈值 (±${formatNum(mdc95, 2)}${unitStr})，属于预期测量误差与日常生物学正常波动。`;
     }
   } else {
     // Neutral metric
     if (currentValue > upperThreshold) {
       resultType = 'true_change_neutral';
-      resultLabel = '真实升高 (True Increase)';
-      resultExplanation = `检测到超过预期测量误差的真实升高：实测值较基线升高 +${formatNum(delta, 2)}，超出 95% 测量误差阈值 (±${formatNum(mdc95, 2)})。具体影响需结合实际专项情境综合解释。`;
+      resultLabel = '检测到超过预期测量误差的可检测升高 (Exceeds MDC)';
+      resultExplanation = `检测到超过预期测量误差的可检测升高：实测值较基线升高 +${formatNum(delta, 2)}${unitStr}，超出 95% 最小可检测变化阈值 (±${formatNum(mdc95, 2)}${unitStr})。${contextNote}`;
     } else if (currentValue < lowerThreshold) {
       resultType = 'true_change_neutral';
-      resultLabel = '真实降低 (True Decrease)';
-      resultExplanation = `检测到超过预期测量误差的真实降低：实测值较基线降低 ${formatNum(delta, 2)}，超出 95% 测量误差阈值 (±${formatNum(mdc95, 2)})。具体影响需结合实际专项情境综合解释。`;
+      resultLabel = '检测到超过预期测量误差的可检测下降 (Exceeds MDC)';
+      resultExplanation = `检测到超过预期测量误差的可检测下降：实测值较基线降低 ${formatNum(delta, 2)}${unitStr}，超出 95% 最小可检测变化阈值 (±${formatNum(mdc95, 2)}${unitStr})。${contextNote}`;
     } else {
       resultType = 'within_noise';
       resultLabel = '在预期测量误差范围内 (Within Measurement Noise)';
-      resultExplanation = `变化量在正常预期测量误差范围之内。`;
+      resultExplanation = `当前变化未超过 95% 最小可检测变化阈值 (±${formatNum(mdc95, 2)}${unitStr})。`;
     }
   }
 
@@ -498,7 +504,8 @@ export function evaluateTrueChange(
     baselineValue,
     reference.mdc95,
     currentValue,
-    reference.direction
+    reference.direction,
+    reference.unit
   );
 
   return {
@@ -507,6 +514,7 @@ export function evaluateTrueChange(
     athleteName,
     date,
     referenceId: reference.id,
+    referenceVersion: reference.version,
     referenceName: `${reference.metricName} (${reference.sport} - ${reference.testName})`,
     metricName: reference.metricName,
     unit: reference.unit,
