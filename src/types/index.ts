@@ -117,10 +117,10 @@ export interface ReliabilityStats {
   cvLower95: number;
   cvUpper95: number;
   cvMethod: 'te_div_pooled_mean';
-  // Minimum Detectable Change (MDC95) & MDC%
-  mdcConfidenceLevel: 95;
-  mdc95: number; // SEM * 1.95996 * sqrt(2)
-  mdcPercent: number; // (MDC95 / grandMean) * 100
+  // Minimum Detectable Change (MDC95/MDC90) & MDC%
+  mdcConfidenceLevel: 90 | 95;
+  mdc95: number; // SEM * z * sqrt(2)
+  mdcPercent: number; // (MDC / grandMean) * 100
   mdcMethod: 'sem_times_z_times_sqrt2';
   // Bland-Altman
   loaLower: number; // meanBias - 1.96 * biasSD

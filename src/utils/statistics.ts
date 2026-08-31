@@ -5,101 +5,79 @@ import {
 } from '../types';
 
 /**
- * Statistical engine for sports test-retest reliability calculations.
- * Strict mathematical implementation following Hopkins (2000), Weir (2005),
- * Bland & Altman (1986, 1999), McGraw & Wong (1996), and Shaw et al. (2026).
- *
- * Core Definitions:
- * - Difference: Diff_i = T2_i - T1_i
- * - Mean Bias: mean(Diff)
- * - SDdiff: sample SD(Diff) = sqrt( sum((Diff_i - MeanBias)^2) / (n - 1) )
- * - Typical Error (TE): SDdiff / sqrt(2)
- * - Pooled Mean: (mean(T1) + mean(T2)) / 2
- * - CV%: (TE / Pooled Mean) * 100
- * - Pooled SD: sqrt( ((n1 - 1)*SD1^2 + (n2 - 1)*SD2^2) / (n1 + n2 - 2) )
- * - ICC(A,1): Two-way mixed, absolute agreement, single measure
- * - SEM: Pooled SD * sqrt(1 - ICC_A) [Never equate SEM = TE]
- * - MDC95: SEM * 1.95996 * sqrt(2) [Always uses SEM, never direct TE]
- * - MDC%: (MDC95 / Pooled Mean) * 100
- * - Bland-Altman LoA: Mean Bias +/- 1.96 * SDdiff
+ * Statistical Engine for Sports Test-Retest Reliability Analysis
+ * Rigorous mathematical implementation adhering to:
+ * - Hopkins (2000): Measures of reliability in sports medicine and science
+ * - Weir (2005): Quantifying test-retest reliability using the ICC
+ * - Koo & Li (2016): A Guideline of Selecting and Reporting Intraclass Correlation Coefficients
+ * - McGraw & Wong (1996): Forming inferences about some intraclass correlation coefficients
+ * - Shrout & Fleiss (1979): Intraclass correlations: uses in assessing rater reliability
+ * - Bland & Altman (1986, 1999): Measuring agreement in method comparison studies
+ * - McKay (1932) / Vangel (1996): Confidence intervals for a normal coefficient of variation
+ * - Shaw et al. (2026): Contemporary monitoring and measurement error guidelines
  */
 
 // ==========================================
-// 1. Math & Distribution Utilities
+// 1. Math & Probability Distribution Engine
 // ==========================================
 
-// Incomplete beta function regularized I_x(a, b)
-export function incompleteBeta(a: number, b: number, x: number): number {
-  if (x <= 0) return 0;
-  if (x >= 1) return 1;
+/**
+ * Standard Normal (Gaussian) Cumulative Distribution Function
+ */
+export function normalCDF(z: number): number {
+  if (isNaN(z)) return NaN;
+  const p = 0.3275911;
+  const a1 = 0.254829592;
+  const a2 = -0.284496736;
+  const a3 = 1.421413741;
+  const a4 = -1.453152027;
+  const a5 = 1.061405429;
 
-  if (x > (a + 1) / (a + b + 2)) {
-    return 1 - incompleteBeta(b, a, 1 - x);
-  }
-
-  const factor = Math.exp(
-    logGamma(a + b) - logGamma(a) - logGamma(b) + a * Math.log(x) + b * Math.log(1 - x)
-  ) / a;
-
-  let c = 1;
-  let d = 1 / (1 - (a + b) * x / (a + 1));
-  let h = d;
-
-  for (let m = 1; m <= 100; m++) {
-    let num = (m * (b - m) * x) / ((a + 2 * m - 1) * (a + 2 * m));
-    d = 1 + num * d;
-    if (Math.abs(d) < 1e-30) d = 1e-30;
-    c = 1 + num / c;
-    if (Math.abs(c) < 1e-30) c = 1e-30;
-    d = 1 / d;
-    h *= d * c;
-
-    num = -((a + m) * (a + b + m) * x) / ((a + 2 * m) * (a + 2 * m + 1));
-    d = 1 + num * d;
-    if (Math.abs(d) < 1e-30) d = 1e-30;
-    c = 1 + num / c;
-    if (Math.abs(c) < 1e-30) c = 1e-30;
-    d = 1 / d;
-    const del = d * c;
-    h *= del;
-
-    if (Math.abs(del - 1) < 1e-10) break;
-  }
-
-  return factor * h;
+  const sign = z < 0 ? -1 : 1;
+  const x = Math.abs(z) / Math.SQRT2;
+  const t = 1.0 / (1.0 + p * x);
+  const erf = 1.0 - (((((a5 * t + a4) * t) + a3) * t + a2) * t + a1) * t * Math.exp(-x * x);
+  return 0.5 * (1.0 + sign * erf);
 }
 
-// Lanczos approximation for Gamma(z)
-export function lanczosGamma(z: number): number {
-  const g = 7;
-  const C = [
-    0.99999999999980993,
-    676.5203681218851,
-    -1259.1392167224028,
-    771.32342877765313,
-    -176.61502916214059,
-    12.507343278686905,
-    -0.13857109585720572,
-    9.9843695780195716e-6,
-    1.5056327351493116e-7
-  ];
+/**
+ * Standard Normal Quantile Function (Inverse CDF) - Beasley-Springer-Moro / Acklam
+ */
+export function normalQuantile(p: number): number {
+  if (p <= 0) return -8.0;
+  if (p >= 1) return 8.0;
 
-  if (z < 0.5) {
-    return Math.PI / (Math.sin(Math.PI * z) * lanczosGamma(1 - z));
+  // Coefficients in rational approximations
+  const a = [-3.969683028665376e+01, 2.209460984245205e+02, -2.759285104469687e+02, 1.383577518672690e+02, -3.066479806614716e+01, 2.506628277459239e+00];
+  const b = [-5.447609879822406e+01, 1.615858368580409e+02, -1.556989798598866e+02, 6.680131188771972e+01, -1.328068155288572e+01];
+  const c = [-7.784894002430293e-03, -3.223964580411365e-01, -2.400758277161838e+00, -2.549732539343734e+00, 4.374664141464968e+00, 2.938163982698783e+00];
+  const d = [7.784695709041462e-03, 3.224671290700398e-01, 2.445134137142996e+00, 3.754408661907416e+00];
+
+  const pLow = 0.02425;
+  const pHigh = 1 - pLow;
+  let q: number, r: number;
+
+  if (p < pLow) {
+    q = Math.sqrt(-2 * Math.log(p));
+    return (((((c[0] * q + c[1]) * q + c[2]) * q + c[3]) * q + c[4]) * q + c[5]) /
+      ((((d[0] * q + d[1]) * q + d[2]) * q + d[3]) * q + 1);
   }
-
-  z -= 1;
-  let x = C[0];
-  for (let i = 1; i < g + 2; i++) {
-    x += C[i] / (z + i);
+  if (p <= pHigh) {
+    q = p - 0.5;
+    r = q * q;
+    return (((((a[0] * r + a[1]) * r + a[2]) * r + a[3]) * r + a[4]) * r + a[5]) * q /
+      (((((b[0] * r + b[1]) * r + b[2]) * r + b[3]) * r + b[4]) * r + 1);
   }
-
-  const t = z + g + 0.5;
-  return Math.sqrt(2 * Math.PI) * Math.pow(t, z + 0.5) * Math.exp(-t) * x;
+  q = Math.sqrt(-2 * Math.log(1 - p));
+  return -(((((c[0] * q + c[1]) * q + c[2]) * q + c[3]) * q + c[4]) * q + c[5]) /
+    ((((d[0] * q + d[1]) * q + d[2]) * q + d[3]) * q + 1);
 }
 
-// Log gamma function
+/**
+ * Natural log of Gamma function using Lanczos approximation (g=7)
+ */
 export function logGamma(z: number): number {
+  if (z <= 0) return 0;
   const g = 7;
   const C = [
     0.99999999999980993,
@@ -127,33 +105,143 @@ export function logGamma(z: number): number {
   return 0.5 * Math.log(2 * Math.PI) + (z + 0.5) * Math.log(t) - t + Math.log(x);
 }
 
-// Approximate Student's t cumulative distribution function
-export function studentTCDF(t: number, df: number): number {
-  if (df <= 0) return 0.5;
-  const x = (t + Math.sqrt(t * t + df)) / (2 * Math.sqrt(t * t + df));
-  return incompleteBeta(df / 2, df / 2, x);
+/**
+ * Regularized Incomplete Beta Function I_x(a, b)
+ */
+export function incompleteBeta(a: number, b: number, x: number): number {
+  if (x <= 0) return 0;
+  if (x >= 1) return 1;
+
+  // Use symmetry transformation if needed for faster convergence
+  if (x > (a + 1) / (a + b + 2)) {
+    return 1 - incompleteBeta(b, a, 1 - x);
+  }
+
+  const factor = Math.exp(
+    logGamma(a + b) - logGamma(a) - logGamma(b) + a * Math.log(x) + b * Math.log(1 - x)
+  ) / a;
+
+  // Continued fraction using modified Lentz method
+  let c = 1;
+  let d = 1 / (1 - (a + b) * x / (a + 1));
+  let h = d;
+
+  for (let m = 1; m <= 200; m++) {
+    let num = (m * (b - m) * x) / ((a + 2 * m - 1) * (a + 2 * m));
+    d = 1 + num * d;
+    if (Math.abs(d) < 1e-30) d = 1e-30;
+    c = 1 + num / c;
+    if (Math.abs(c) < 1e-30) c = 1e-30;
+    d = 1 / d;
+    h *= d * c;
+
+    num = -((a + m) * (a + b + m) * x) / ((a + 2 * m) * (a + 2 * m + 1));
+    d = 1 + num * d;
+    if (Math.abs(d) < 1e-30) d = 1e-30;
+    c = 1 + num / c;
+    if (Math.abs(c) < 1e-30) c = 1e-30;
+    d = 1 / d;
+    const del = d * c;
+    h *= del;
+
+    if (Math.abs(del - 1) < 1e-12) break;
+  }
+
+  return factor * h;
 }
 
-// Cumulative distribution function for F distribution
+/**
+ * Student's t Cumulative Distribution Function
+ */
+export function studentTCDF(t: number, df: number): number {
+  if (df <= 0) return 0.5;
+  if (t === 0) return 0.5;
+  const x = (t + Math.sqrt(t * t + df)) / (2 * Math.sqrt(t * t + df));
+  return Math.max(0, Math.min(1, incompleteBeta(df / 2, df / 2, x)));
+}
+
+/**
+ * Two-tailed critical value for Student's t distribution
+ * @param df degrees of freedom
+ * @param alpha significance level (e.g. 0.05 for 95% CI, 0.10 for 90% CI)
+ */
+export function getTCritical(df: number, alpha: number = 0.05): number {
+  if (df <= 0) return 1.95996;
+  const pTarget = 1 - alpha / 2;
+  const z = normalQuantile(pTarget);
+  // Cornish-Fisher expansion
+  let t = z + (z * z * z + z) / (4 * df) + (5 * Math.pow(z, 5) + 16 * Math.pow(z, 3) + 3 * z) / (96 * df * df);
+
+  // 3 steps Newton-Raphson refinement
+  for (let i = 0; i < 4; i++) {
+    const cdf = studentTCDF(t, df);
+    const pdf = Math.exp(logGamma((df + 1) / 2) - logGamma(df / 2)) /
+      (Math.sqrt(Math.PI * df) * Math.pow(1 + (t * t) / df, (df + 1) / 2));
+    const diff = cdf - pTarget;
+    if (Math.abs(diff) < 1e-8 || pdf <= 0) break;
+    t -= diff / pdf;
+  }
+  return Math.max(0.01, t);
+}
+
+/**
+ * Chi-Square Cumulative Distribution Function
+ */
+export function chiSquareCDF(x: number, df: number): number {
+  if (x <= 0 || df <= 0) return 0;
+  // Lower regularized gamma P(df/2, x/2)
+  return incompleteBeta(df / 2, 1000000, x / (x + 2 * 1000000));
+}
+
+/**
+ * Chi-Square Quantile Function (Inverse CDF) using Wilson-Hilferty + Newton refinement
+ */
+export function getChiSquareQuantile(df: number, p: number): number {
+  if (df <= 0) return 0;
+  if (p <= 0.0001) p = 0.0001;
+  if (p >= 0.9999) p = 0.9999;
+
+  const z = normalQuantile(p);
+  // Wilson-Hilferty transformation
+  const term = 1 - 2 / (9 * df) + z * Math.sqrt(2 / (9 * df));
+  let x = df * Math.pow(Math.max(0.0001, term), 3);
+
+  // Binary search / bisection refinement for exact convergence
+  let low = Math.max(0.0001, x * 0.5);
+  let high = x * 1.5 + 2;
+  for (let i = 0; i < 20; i++) {
+    const mid = (low + high) / 2;
+    const pMid = chiSquareCDF(mid, df);
+    if (Math.abs(pMid - p) < 1e-7) {
+      x = mid;
+      break;
+    }
+    if (pMid < p) low = mid;
+    else high = mid;
+    x = (low + high) / 2;
+  }
+  return Math.max(0.001, x);
+}
+
+/**
+ * F-distribution Cumulative Distribution Function
+ */
 export function fCDF(f: number, df1: number, df2: number): number {
-  if (f <= 0) return 0;
+  if (f <= 0 || df1 <= 0 || df2 <= 0) return 0;
   const x = (df1 * f) / (df1 * f + df2);
   return incompleteBeta(df1 / 2, df2 / 2, x);
 }
 
-// Student t critical value for two-tailed alpha=0.05
-export function getTCritical(df: number, alpha: number = 0.05): number {
-  if (df <= 0) return 1.96;
-  const z = alpha === 0.05 ? 1.95996 : 1.64485;
-  const a = (z * z + 1) / (4 * df);
-  const b = (5 * Math.pow(z, 4) + 16 * z * z + 3) / (96 * df * df);
-  return z + a * z + b * z;
-}
-
-// F-distribution quantile approximation
+/**
+ * Exact F-distribution Quantile Function (Inverse CDF)
+ */
 export function getFQuantile(df1: number, df2: number, p: number): number {
-  if (df1 <= 0 || df2 <= 0) return 1;
-  const z = p === 0.975 ? 1.95996 : p === 0.025 ? -1.95996 : 1.64485;
+  if (df1 <= 0 || df2 <= 0) return 1.0;
+  if (p <= 0.0001) p = 0.0001;
+  if (p >= 0.9999) p = 0.9999;
+
+  // Paulson's approximation
+  const z = normalQuantile(p);
   const d1 = 2 / (9 * df1);
   const d2 = 2 / (9 * df2);
   const h1 = 1 - d1;
@@ -161,13 +249,28 @@ export function getFQuantile(df1: number, df2: number, p: number): number {
   const term1 = h1 * h2;
   const term2 = z * Math.sqrt(d1 * h2 * h2 + d2 * h1 * h1 - d1 * d2 * z * z);
   const denom = h2 * h2 - d2 * z * z;
-  if (denom <= 0) return 1;
-  const w = (term1 + term2) / denom;
-  return Math.max(0.001, Math.pow(w, 3));
+  let fInit = denom > 0 ? Math.pow(Math.max(0.01, (term1 + term2) / denom), 3) : 1.0;
+
+  // Bisection refinement
+  let low = Math.max(0.0001, fInit * 0.2);
+  let high = Math.max(10.0, fInit * 3.0);
+  for (let i = 0; i < 25; i++) {
+    const mid = (low + high) / 2;
+    const cdf = fCDF(mid, df1, df2);
+    if (Math.abs(cdf - p) < 1e-7) {
+      return mid;
+    }
+    if (cdf < p) {
+      low = mid;
+    } else {
+      high = mid;
+    }
+  }
+  return (low + high) / 2;
 }
 
 // ==========================================
-// 2. Decoupled Core Statistical Functions
+// 2. Core Statistical Functions
 // ==========================================
 
 /**
@@ -185,7 +288,11 @@ export function calculateDifference(t1: number[], t2: number[]): number[] {
  * Mean Bias = mean(Diff)
  * SDdiff = sample SD(Diff)
  */
-export function calculateBias(diffs: number[], grandMean: number = 0): {
+export function calculateBias(
+  diffs: number[],
+  grandMean: number = 0,
+  confidenceLevel: 90 | 95 = 95
+): {
   meanBias: number;
   sdDiff: number;
   biasSE: number;
@@ -209,40 +316,54 @@ export function calculateBias(diffs: number[], grandMean: number = 0): {
   const biasSE = sdDiff / Math.sqrt(n);
 
   const df = n - 1;
-  const tCrit = getTCritical(df, 0.05);
+  const alpha = confidenceLevel === 90 ? 0.10 : 0.05;
+  const tCrit = getTCritical(df, alpha);
   const bias95CILower = meanBias - tCrit * biasSE;
   const bias95CIUpper = meanBias + tCrit * biasSE;
 
-  const pairedTStat = biasSE > 0 ? meanBias / biasSE : 0;
-  const tCDF = studentTCDF(Math.abs(pairedTStat), df);
-  const pairedTPValue = Math.max(0, Math.min(1, 2 * (1 - tCDF)));
-  const hasSignificantBias = pairedTPValue < 0.05;
+  let pairedTStat = 0;
+  let pairedTPValue = 1.0;
+  let hasSignificantBias = false;
 
-  // Practical bias magnitude relative to grand mean
-  const biasPercent = grandMean !== 0 ? (Math.abs(meanBias) / grandMean) * 100 : 0;
+  if (biasSE > 1e-12) {
+    pairedTStat = meanBias / biasSE;
+    const tCDF = studentTCDF(Math.abs(pairedTStat), df);
+    pairedTPValue = Math.max(0, Math.min(1, 2 * (1 - tCDF)));
+    hasSignificantBias = pairedTPValue < alpha;
+  } else {
+    // Edge case: SDdiff = 0 (all subjects had identical changes)
+    if (Math.abs(meanBias) > 1e-9) {
+      pairedTStat = meanBias > 0 ? 999999 : -999999;
+      pairedTPValue = 0.0;
+      hasSignificantBias = true;
+    } else {
+      pairedTStat = 0;
+      pairedTPValue = 1.0;
+      hasSignificantBias = false;
+    }
+  }
 
-  // Practical magnitude classification:
-  // <= 2% -> PASS
-  // 2% ~ 5% -> CAUTION
-  // > 5% -> FAIL
+  // Bias % relative to grand mean
+  const biasPercent = grandMean !== 0 ? (Math.abs(meanBias) / Math.abs(grandMean)) * 100 : 0;
+
   let biasEvaluation: 'pass' | 'caution' | 'fail' = 'pass';
   let biasNote = '';
 
   if (biasPercent <= 2.0) {
     biasEvaluation = 'pass';
     if (hasSignificantBias) {
-      biasNote = 'Statistically significant but practically small systematic bias (统计学显著但实际偏差微小)';
+      biasNote = 'Statistically significant but practically small systematic bias (统计学显著但实际偏差微小 ≤2%)';
     } else {
-      biasNote = 'Practically negligible systematic bias without statistical evidence (无统计显著性且实际偏差微小)';
+      biasNote = 'Practically negligible systematic bias without statistical significance (实际偏差微小 ≤2%)';
     }
   } else if (biasPercent <= 5.0) {
     biasEvaluation = 'caution';
     biasNote = hasSignificantBias
-      ? 'Statistically significant and moderate systematic bias (2%~5%) (统计学显著且呈中度系统偏差)'
-      : 'Moderate systematic bias without strong statistical evidence (中度系统偏差，统计证据不足)';
+      ? 'Statistically significant and moderate systematic bias (2%~5%) (中度系统偏差，可能存在学习效应或疲劳残留)'
+      : 'Moderate systematic bias without strong statistical significance (2%~5%) (中度系统偏差)';
   } else {
     biasEvaluation = 'fail';
-    biasNote = 'Substantial systematic bias (>5%); indicates possible learning effect or fatigue (显著系统偏差 >5%，提示可能存在明显学习或疲劳效应)';
+    biasNote = 'Substantial systematic bias (>5%); test protocol or interval needs optimization (显著系统偏差 >5%，建议重新标定测试间隔或熟悉化流程)';
   }
 
   return {
@@ -263,19 +384,28 @@ export function calculateBias(diffs: number[], grandMean: number = 0): {
 /**
  * 2.3 Calculate Typical Error (TE)
  * TE = SDdiff / sqrt(2)
+ * Exact Confidence Interval derived from Chi-Square distribution:
+ * TE * sqrt(df / chiSq(1 - alpha/2, df)) to TE * sqrt(df / chiSq(alpha/2, df))
  */
-export function calculateTE(sdDiff: number, n: number = 20): {
+export function calculateTE(
+  sdDiff: number,
+  n: number = 20,
+  confidenceLevel: 90 | 95 = 95
+): {
   typicalError: number;
   typicalErrorLower95: number;
   typicalErrorUpper95: number;
   teMethod: 'sd_diff_div_sqrt2';
 } {
-  const typicalError = sdDiff / Math.sqrt(2);
+  const typicalError = sdDiff / Math.SQRT2;
   const df = Math.max(1, n - 1);
-  const teChiSqLower = df / (df + 1.96 * Math.sqrt(2 * df));
-  const teChiSqUpper = df / Math.max(0.1, df - 1.96 * Math.sqrt(2 * df));
-  const typicalErrorLower95 = typicalError * Math.sqrt(Math.max(0.01, teChiSqLower));
-  const typicalErrorUpper95 = typicalError * Math.sqrt(Math.max(0.01, teChiSqUpper));
+  const alpha = confidenceLevel === 90 ? 0.10 : 0.05;
+
+  const chiSqUpper = getChiSquareQuantile(df, 1 - alpha / 2);
+  const chiSqLower = getChiSquareQuantile(df, alpha / 2);
+
+  const typicalErrorLower95 = chiSqUpper > 0 ? typicalError * Math.sqrt(df / chiSqUpper) : typicalError * 0.7;
+  const typicalErrorUpper95 = chiSqLower > 0 ? typicalError * Math.sqrt(df / chiSqLower) : typicalError * 1.5;
 
   return {
     typicalError,
@@ -295,21 +425,44 @@ export function calculatePooledMean(t1Mean: number, t2Mean: number): number {
 
 /**
  * 2.5 Calculate Coefficient of Variation (CV%)
- * V1 Standard: CV = (TE / pooled_mean) * 100
+ * CV = (TE / pooled_mean) * 100
+ * Exact Confidence Interval via McKay's Method / Vangel (1996)
  */
-export function calculateCV(te: number, pooledMean: number, n: number = 20): {
+export function calculateCV(
+  te: number,
+  pooledMean: number,
+  n: number = 20,
+  confidenceLevel: 90 | 95 = 95
+): {
   cvMean: number;
   cvLower95: number;
   cvUpper95: number;
   cvMethod: 'te_div_pooled_mean';
 } {
-  const cvMean = pooledMean !== 0 ? (te / Math.abs(pooledMean)) * 100 : 0;
-  const df = Math.max(1, n - 1);
-  const teChiSqLower = df / (df + 1.96 * Math.sqrt(2 * df));
-  const teChiSqUpper = df / Math.max(0.1, df - 1.96 * Math.sqrt(2 * df));
+  if (!isFinite(pooledMean) || Math.abs(pooledMean) < 1e-6 || !isFinite(te) || te < 0) {
+    return {
+      cvMean: NaN,
+      cvLower95: NaN,
+      cvUpper95: NaN,
+      cvMethod: 'te_div_pooled_mean'
+    };
+  }
 
-  const cvLower95 = cvMean * Math.sqrt(Math.max(0.01, teChiSqLower));
-  const cvUpper95 = cvMean * Math.sqrt(Math.max(0.01, teChiSqUpper));
+  const cvMean = (te / Math.abs(pooledMean)) * 100;
+  const df = Math.max(1, n - 1);
+  const alpha = confidenceLevel === 90 ? 0.10 : 0.05;
+
+  const u1 = getChiSquareQuantile(df, 1 - alpha / 2); // Upper chi-sq quantile for lower bound
+  const u2 = getChiSquareQuantile(df, alpha / 2);     // Lower chi-sq quantile for upper bound
+
+  const c = cvMean / 100;
+
+  // McKay's approximation (Vangel 1996, The American Statistician)
+  const denomLower = Math.sqrt(Math.max(0.001, ((u1 / (df + 1)) - 1) * c * c + (u1 / df)));
+  const denomUpper = Math.sqrt(Math.max(0.001, ((u2 / (df + 1)) - 1) * c * c + (u2 / df)));
+
+  const cvLower95 = denomLower > 0 ? (c / denomLower) * 100 : cvMean * 0.7;
+  const cvUpper95 = denomUpper > 0 ? (c / denomUpper) * 100 : cvMean * 1.5;
 
   return {
     cvMean,
@@ -371,13 +524,13 @@ export function calculateANOVA2Way(pairs: AggregatedPairData[]): ANOVA2WayResult
   const ssError = Math.max(0, ssTotal - ssRow - ssCol);
 
   const dfRow = n - 1;
-  const dfCol = 1;
-  const dfError = n - 1;
+  const dfCol = 1; // 2 sessions -> k - 1 = 1
+  const dfError = n - 1; // (n - 1) * (k - 1) = n - 1
   const dfTotal = 2 * n - 1;
 
-  const msRow = ssRow / dfRow;
-  const msCol = ssCol / dfCol;
-  const msError = ssError / dfError;
+  const msRow = dfRow > 0 ? ssRow / dfRow : 0;
+  const msCol = dfCol > 0 ? ssCol / dfCol : 0;
+  const msError = dfError > 0 ? ssError / dfError : 0;
 
   return {
     ssTotal,
@@ -396,12 +549,15 @@ export function calculateANOVA2Way(pairs: AggregatedPairData[]): ANOVA2WayResult
 
 /**
  * 2.8 Calculate Intraclass Correlation Coefficient (ICC)
- * Model: Two-Way Mixed Effects
- * Definition: Absolute Agreement (ICC(A,1)) and Consistency (ICC(C,1))
- * Measure Type: Single Measure
+ * Model: Two-Way Mixed Effects, Single Measure (k=2)
+ * Absolute Agreement: ICC(A,1)
+ * Consistency: ICC(C,1)
+ * Confidence Interval: McGraw & Wong (1996) / Shrout & Fleiss (1979)
+ * Note: Confidence interval can mathematically span negative values and is NOT artificially clamped to 0.
  */
 export function calculateICC(
-  pairs: AggregatedPairData[]
+  pairs: AggregatedPairData[],
+  confidenceLevel: 90 | 95 = 95
 ): {
   iccA1: number;
   iccA1Lower95: number;
@@ -423,27 +579,54 @@ export function calculateICC(
   const msRows = anova.msRow;
   const msCols = anova.msCol;
   const msError = anova.msError;
+  const k = 2;
 
   // ICC(A,1) - Absolute Agreement
-  const iccADenom = msRows + msError + (2 / n) * (msCols - msError);
-  let iccA1 = iccADenom > 0 ? (msRows - msError) / iccADenom : 0;
+  const iccADenom = msRows + (k - 1) * msError + (k / n) * (msCols - msError);
+  let iccA1 = iccADenom > 1e-12 ? (msRows - msError) / iccADenom : 0;
   iccA1 = Math.max(-1, Math.min(1, iccA1));
 
   // ICC(C,1) - Consistency
-  const iccCDecom = msRows + msError;
-  let iccC1 = iccCDecom > 0 ? (msRows - msError) / iccCDecom : 0;
+  const iccCDecom = msRows + (k - 1) * msError;
+  let iccC1 = iccCDecom > 1e-12 ? (msRows - msError) / iccCDecom : 0;
   iccC1 = Math.max(-1, Math.min(1, iccC1));
 
-  // 95% Confidence Interval for ICC(A,1) & ICC(C,1)
-  const fRatio = msError > 0 ? msRows / msError : 1;
-  const fUpper = getFQuantile(n - 1, n - 1, 0.975);
+  // Confidence Intervals for k = 2
+  const alpha = confidenceLevel === 90 ? 0.10 : 0.05;
+  const fObs = msError > 1e-12 ? msRows / msError : 1;
 
-  let iccC1Lower95 = Math.max(0, (fRatio / fUpper - 1) / (fRatio / fUpper + 1));
-  let iccC1Upper95 = Math.min(1, (fRatio * fUpper - 1) / (fRatio * fUpper + 1));
+  // Exact F quantiles for (n-1, n-1)
+  const fUpper = getFQuantile(n - 1, n - 1, 1 - alpha / 2);
+  const fLower = 1 / fUpper;
 
-  const seApprox = Math.sqrt(Math.max(0, (2 * Math.pow(1 - iccA1, 2) * Math.pow(1 + iccA1, 2)) / Math.max(1, n - 1)));
-  let iccA1Lower95 = Math.max(0, iccA1 - 1.96 * seApprox);
-  let iccA1Upper95 = Math.min(1, iccA1 + 1.96 * seApprox);
+  // ICC(C,1) exact bounds
+  let iccC1Lower95 = (fObs * fLower - 1) / (fObs * fLower + k - 1);
+  let iccC1Upper95 = (fObs * fUpper - 1) / (fObs * fUpper + k - 1);
+  iccC1Lower95 = Math.max(-1, Math.min(1, iccC1Lower95));
+  iccC1Upper95 = Math.max(-1, Math.min(1, iccC1Upper95));
+
+  // ICC(A,1) exact bounds (McGraw & Wong 1996, Formula 8 & 11)
+  // For k=2, dfRow = n-1, dfCol = 1, dfError = n-1:
+  const f1 = fUpper;
+  const f2 = fUpper;
+
+  const numL = n * (msRows - f1 * msError);
+  const denL = f1 * (k * msCols + (k * n - k - n) * msError) + n * msRows;
+  let iccA1Lower95 = denL > 1e-12 ? numL / denL : iccC1Lower95;
+
+  const numU = n * (f2 * msRows - msError);
+  const denU = (k * msCols + (k * n - k - n) * msError) + n * f2 * msRows;
+  let iccA1Upper95 = denU > 1e-12 ? numU / denU : iccC1Upper95;
+
+  // Allow negative lower bounds, bounded strictly within [-1, 1]
+  iccA1Lower95 = Math.max(-1, Math.min(1, iccA1Lower95));
+  iccA1Upper95 = Math.max(-1, Math.min(1, iccA1Upper95));
+
+  if (iccA1Lower95 > iccA1Upper95) {
+    const tmp = iccA1Lower95;
+    iccA1Lower95 = iccA1Upper95;
+    iccA1Upper95 = tmp;
+  }
 
   return {
     iccA1,
@@ -462,7 +645,7 @@ export function calculateICC(
 /**
  * 2.9 Calculate Standard Error of Measurement (SEM)
  * SEM = pooled_SD * sqrt(1 - ICC_A)
- * Crucial: SEM is computed independently from pooled_SD and ICC_A, never assigned from TE!
+ * Note: Never equated directly to TE.
  */
 export function calculateSEM(
   pooledSD: number,
@@ -471,7 +654,7 @@ export function calculateSEM(
   sem: number;
   semMethod: 'pooled_sd_sqrt_1_minus_icc';
 } {
-  const boundedICC = Math.max(0, Math.min(1, iccA1));
+  const boundedICC = Math.max(-1, Math.min(1, iccA1));
   const sem = pooledSD * Math.sqrt(Math.max(0, 1 - boundedICC));
   return {
     sem,
@@ -480,44 +663,59 @@ export function calculateSEM(
 }
 
 /**
- * 2.10 Calculate Minimal Detectable Change (MDC95)
- * MDC95 = SEM * 1.95996 * sqrt(2)
- * Principle: sqrt(2) combines pre-post error, 1.96 gives 95% confidence level.
- * Always calls SEM.
+ * 2.10 Calculate Minimal Detectable Change (MDC)
+ * MDC = SEM * z * sqrt(2)
+ * For 95% Confidence: z = 1.959964
+ * For 90% Confidence: z = 1.6448536
  */
 export function calculateMDC95(
   sem: number,
-  z: number = 1.95996
+  zOrConfidenceLevel: number = 95
 ): {
   mdc95: number;
   mdcMethod: 'sem_times_z_times_sqrt2';
-  mdcConfidenceLevel: 95;
+  mdcConfidenceLevel: 90 | 95;
 } {
-  const mdc95 = sem * z * Math.sqrt(2);
+  let z = 1.959964;
+  let confLevel: 90 | 95 = 95;
+
+  if (zOrConfidenceLevel === 90) {
+    z = 1.6448536;
+    confLevel = 90;
+  } else if (zOrConfidenceLevel === 95) {
+    z = 1.959964;
+    confLevel = 95;
+  } else if (typeof zOrConfidenceLevel === 'number' && zOrConfidenceLevel > 0 && zOrConfidenceLevel < 5) {
+    z = zOrConfidenceLevel;
+    confLevel = Math.abs(z - 1.64485) < 0.1 ? 90 : 95;
+  }
+
+  const mdc95 = sem * z * Math.SQRT2;
   return {
     mdc95,
     mdcMethod: 'sem_times_z_times_sqrt2',
-    mdcConfidenceLevel: 95
+    mdcConfidenceLevel: confLevel
   };
 }
 
 /**
  * 2.11 Calculate MDC% (Sensitivity)
- * MDC% = (MDC95 / pooled_mean) * 100
+ * MDC% = (MDC / pooled_mean) * 100
  */
-export function calculateMDCPercent(mdc95: number, pooledMean: number): number {
-  return pooledMean !== 0 ? (mdc95 / Math.abs(pooledMean)) * 100 : 0;
+export function calculateMDCPercent(mdc: number, pooledMean: number): number {
+  return isFinite(pooledMean) && pooledMean !== 0 ? (mdc / Math.abs(pooledMean)) * 100 : 0;
 }
 
 /**
  * 2.12 Calculate Bland-Altman Limits of Agreement (LoA)
- * Lower LoA = Mean Bias - 1.96 * SDdiff
- * Upper LoA = Mean Bias + 1.96 * SDdiff
+ * Lower LoA = Mean Bias - z * SDdiff
+ * Upper LoA = Mean Bias + z * SDdiff
  */
 export function calculateBlandAltman(
   meanBias: number,
   sdDiff: number,
-  n: number
+  n: number,
+  confidenceLevel: 90 | 95 = 95
 ): {
   loaLower: number;
   loaUpper: number;
@@ -526,11 +724,14 @@ export function calculateBlandAltman(
   loaUpperCILower: number;
   loaUpperCIUpper: number;
 } {
-  const loaLower = meanBias - 1.96 * sdDiff;
-  const loaUpper = meanBias + 1.96 * sdDiff;
+  const z = confidenceLevel === 90 ? 1.6448536 : 1.959964;
+  const loaLower = meanBias - z * sdDiff;
+  const loaUpper = meanBias + z * sdDiff;
 
   const df = Math.max(1, n - 1);
-  const tCrit = getTCritical(df, 0.05);
+  const alpha = confidenceLevel === 90 ? 0.10 : 0.05;
+  const tCrit = getTCritical(df, alpha);
+  // Standard error of LoA limit (Bland & Altman 1999)
   const loaSE = Math.sqrt((3 * Math.pow(sdDiff, 2)) / Math.max(1, n));
 
   const loaLowerCILower = loaLower - tCrit * loaSE;
@@ -557,7 +758,8 @@ export function calculateReliability(
   metricId: string,
   metricName: string,
   unit: string,
-  direction: MetricDirection = 'higher_is_better'
+  direction: MetricDirection = 'higher_is_better',
+  confidenceLevel: 90 | 95 = 95
 ): ReliabilityStats {
   const n = pairs.length;
   if (n < 2) {
@@ -576,35 +778,35 @@ export function calculateReliability(
   const t1SD = Math.sqrt(Math.max(0, t1Var));
   const t2SD = Math.sqrt(Math.max(0, t2Var));
 
-  // 2. Pooled Mean (V1 standard)
+  // 2. Pooled Mean
   const grandMean = calculatePooledMean(t1Mean, t2Mean);
 
   // 3. Difference & Systematic Bias
   const diffs = calculateDifference(t1Values, t2Values);
-  const biasStats = calculateBias(diffs, grandMean);
+  const biasStats = calculateBias(diffs, grandMean, confidenceLevel);
 
   // 4. Typical Error (TE = SDdiff / sqrt(2))
-  const teStats = calculateTE(biasStats.sdDiff, n);
+  const teStats = calculateTE(biasStats.sdDiff, n, confidenceLevel);
 
-  // 5. CV% (V1: TE / grandMean * 100)
-  const cvStats = calculateCV(teStats.typicalError, grandMean, n);
+  // 5. CV% (TE / grandMean * 100)
+  const cvStats = calculateCV(teStats.typicalError, grandMean, n, confidenceLevel);
 
   // 6. Two-Way Mixed ANOVA & ICC (ICC(A,1) and ICC(C,1))
-  const iccStats = calculateICC(pairs);
+  const iccStats = calculateICC(pairs, confidenceLevel);
 
   // 7. Pooled SD
   const pooledSD = calculatePooledSD(t1SD, t2SD, n, n);
 
-  // 8. SEM = pooled_SD * sqrt(1 - ICC_A) [Never equate SEM = TE]
+  // 8. SEM = pooled_SD * sqrt(1 - ICC_A)
   const semStats = calculateSEM(pooledSD, iccStats.iccA1);
 
-  // 9. MDC95 = SEM * 1.95996 * sqrt(2)
-  const mdcStats = calculateMDC95(semStats.sem);
+  // 9. MDC (SEM * z * sqrt(2))
+  const mdcStats = calculateMDC95(semStats.sem, confidenceLevel);
   const mdcPercent = calculateMDCPercent(mdcStats.mdc95, grandMean);
   const biasToMdcRatio = mdcStats.mdc95 > 0 ? Math.abs(biasStats.meanBias) / mdcStats.mdc95 : 0;
 
   // 10. Bland-Altman Limits of Agreement
-  const baStats = calculateBlandAltman(biasStats.meanBias, biasStats.sdDiff, n);
+  const baStats = calculateBlandAltman(biasStats.meanBias, biasStats.sdDiff, n, confidenceLevel);
 
   return {
     metricId,

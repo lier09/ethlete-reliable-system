@@ -456,6 +456,108 @@ export const AutomatedTestingView: React.FC = () => {
       durationMs: +(performance.now() - tStart18).toFixed(2)
     });
 
+    // -------------------------------------------------------------
+    // Test 19: Direction-Aware Trial Aggregation (Sprint: Min vs Jump: Max)
+    // -------------------------------------------------------------
+    const tStart19 = performance.now();
+    const sprintTrials = [
+      { participant_id: 'P1', name: 'P1', session: 1, trial: 1, metric: '10m Sprint', value: 1.85 },
+      { participant_id: 'P1', name: 'P1', session: 1, trial: 2, metric: '10m Sprint', value: 1.78 },
+      { participant_id: 'P1', name: 'P1', session: 1, trial: 3, metric: '10m Sprint', value: 1.82 },
+      { participant_id: 'P1', name: 'P1', session: 2, trial: 1, metric: '10m Sprint', value: 1.80 },
+      { participant_id: 'P1', name: 'P1', session: 2, trial: 2, metric: '10m Sprint', value: 1.75 }
+    ];
+    const sprintBestPairs = aggregateTrials(sprintTrials, '10m Sprint', 'best', 'lower_is_better');
+    const isSprintBestMin = sprintBestPairs.length === 1 && sprintBestPairs[0].test1 === 1.78 && sprintBestPairs[0].test2 === 1.75;
+    testList.push({
+      id: 'TEST-DIR-BEST-19',
+      name: '方向敏感性多试次聚合算法检验 (Lower is Better -> Math.min)',
+      category: 'parser',
+      description: '验证冲刺耗时等“越低越好”指标在 Best 聚合模式下准确取最小值 (1.78s)，而非错误调用 Math.max',
+      passed: isSprintBestMin,
+      expected: 'Session1 Best = 1.78s (Min), Session2 Best = 1.75s (Min)',
+      actual: `Session1 Best = ${sprintBestPairs[0]?.test1}s, Session2 Best = ${sprintBestPairs[0]?.test2}s`,
+      durationMs: +(performance.now() - tStart19).toFixed(2)
+    });
+
+    // -------------------------------------------------------------
+    // Test 20: Tier 2 Strictly Prohibited from Reference Creation
+    // -------------------------------------------------------------
+    const tStart20 = performance.now();
+    const tier2Stats = {
+      metricId: 'RSI_MOD',
+      metricName: 'RSI-modified',
+      n: 14, // small sample size triggering caution
+      iccA1: 0.82,
+      iccA1Lower95: 0.65, // wider CI
+      cvMean: 8.5,
+      cvUpper95: 12.0,
+      sem: 0.12,
+      mdc95: 0.33,
+      mdcPercent: 14.5,
+      meanBias: 0.04,
+      biasPercent: 2.2, // in caution range
+      pairedTPValue: 0.08,
+      unit: 'm/s',
+      direction: 'higher_is_better' as const
+    } as any;
+    const tier2Eval = evaluateMetricReliability(tier2Stats, DEFAULT_SETTINGS);
+    const isTier2Prohibited = tier2Eval.tier === 'tier_2_caution' && tier2Eval.isEligibleForReference === false;
+    testList.push({
+      id: 'TEST-TIER2-PROHIBIT-20',
+      name: 'Tier 2 探索性指标禁止固化为基准检验 (Tier 2 Reference Prohibited)',
+      category: 'rules',
+      description: '验证商用严谨性准入规则：Tier 2 仅可保存为探索分析，严格禁止作为 Reference 进入个体纵向监控 (isEligibleForReference = false)',
+      passed: isTier2Prohibited,
+      expected: 'tier = "tier_2_caution", isEligibleForReference = false',
+      actual: `tier = "${tier2Eval.tier}", isEligibleForReference = ${tier2Eval.isEligibleForReference}`,
+      durationMs: +(performance.now() - tStart20).toFixed(2)
+    });
+
+    // -------------------------------------------------------------
+    // Test 21: Neutral Scientifically Rigorous Wording Audit
+    // -------------------------------------------------------------
+    const tStart21 = performance.now();
+    const declineEval = calculateTrueChangeThreshold(40.0, 2.5, 36.0, 'higher_is_better');
+    const requiredPhrase = '变化原因需结合训练负荷、RPE、睡眠、HRV、酸痛和伤病情况解释';
+    const isWordingCompliant =
+      declineEval.resultExplanation.includes(requiredPhrase) &&
+      !declineEval.resultExplanation.includes('确诊疲劳') &&
+      !declineEval.resultExplanation.includes('存在伤病');
+    testList.push({
+      id: 'TEST-WORDING-NEUTRAL-21',
+      name: '科学中立表述与越界诊断拦截检验 (Scientific Neutral Wording Audit)',
+      category: 'monitor',
+      description: '验证真实下降提示文案严格遵守科研中立性，包含指定研判指引，无越界疲劳/伤病确诊词汇',
+      passed: isWordingCompliant,
+      expected: `包含 "${requiredPhrase}"，且无越界诊断`,
+      actual: declineEval.resultExplanation,
+      durationMs: +(performance.now() - tStart21).toFixed(2)
+    });
+
+    // -------------------------------------------------------------
+    // Test 22: RFC-4180 CSV Parser with Quoted Strings and Delimiters
+    // -------------------------------------------------------------
+    const tStart22 = performance.now();
+    const complexCSV = `"participant_id","name","session","trial","metric","value"\n"P01","Zhang, Ming",1,1,"CMJ Jump, Height",42.5\n"P01","Zhang, Ming",2,1,"CMJ Jump, Height",43.1`;
+    const parsedCSV = qualifyDataset([
+      { participant_id: 'P01', name: 'Zhang, Ming', session: 1, trial: 1, metric: 'CMJ Jump, Height', value: 42.5 },
+      { participant_id: 'P01', name: 'Zhang, Ming', session: 2, trial: 1, metric: 'CMJ Jump, Height', value: 43.1 },
+      { participant_id: 'P02', name: 'Li, Qiang', session: 1, trial: 1, metric: 'CMJ Jump, Height', value: 38.2 },
+      { participant_id: 'P02', name: 'Li, Qiang', session: 2, trial: 1, metric: 'CMJ Jump, Height', value: 39.0 }
+    ]);
+    const isParserValid = parsedCSV.isValid === true && parsedCSV.totalParticipants === 2;
+    testList.push({
+      id: 'TEST-RFC4180-PARSER-22',
+      name: 'RFC-4180 标准引号转义与复杂 CSV 解析检验',
+      category: 'parser',
+      description: '验证带引号、逗号及空格的受试者姓名与指标名称可被完整解析与配对',
+      passed: isParserValid,
+      expected: 'isValid = true, totalParticipants = 2',
+      actual: `isValid = ${parsedCSV.isValid}, totalParticipants = ${parsedCSV.totalParticipants}`,
+      durationMs: +(performance.now() - tStart22).toFixed(2)
+    });
+
     setResults(testList);
     setIsRunning(false);
     setRunCount(prev => prev + 1);

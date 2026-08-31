@@ -150,17 +150,17 @@ export const TeamRosterMonitorView: React.FC<Props> = ({
           </div>
         </div>
 
-        {/* True Decline / Fatigue Card */}
+        {/* True Decline Card */}
         <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-xs border-l-4 border-l-rose-500">
           <div className="text-xs font-bold text-rose-600 uppercase tracking-wider mb-1 flex items-center justify-between">
-            <span>🔴 真实机能衰退 / 疲劳</span>
+            <span>🔴 真实超出误差下降</span>
             <span className="text-xs font-mono">{formatNum(stats.fatigueRate, 0)}%</span>
           </div>
           <div className="text-3xl font-bold font-mono text-rose-700">
             {stats.declines} <span className="text-sm font-normal text-rose-600 font-sans">人</span>
           </div>
           <div className="text-[11px] text-rose-600/90 font-medium mt-1">
-            跌破误差下限，需关注负荷疲劳
+            跌破误差下限，需结合负荷解释
           </div>
         </div>
       </div>
@@ -219,7 +219,7 @@ export const TeamRosterMonitorView: React.FC<Props> = ({
                 : 'text-slate-600 hover:text-rose-700'
             }`}
           >
-            🔴 疲劳预警 ({stats.declines})
+            🔴 真实下降 ({stats.declines})
           </button>
         </div>
 

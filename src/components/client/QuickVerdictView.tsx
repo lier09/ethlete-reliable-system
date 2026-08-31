@@ -166,7 +166,7 @@ export const QuickVerdictView: React.FC<Props> = ({
             运动员个体真实变化判定仪 (True Change Evaluator)
           </h2>
           <p className="text-xs text-slate-300 leading-relaxed">
-            输入运动员的前后测成绩，系统将基于经科学标定的 <strong className="text-blue-300 font-mono">MDC₉₅ 测量误差阈值</strong>，自动过滤测试噪声与测量误差，判定是否发生**真实提升**、**正常波动**或**真实疲劳衰退**。
+            输入运动员的前后测成绩，系统将基于经科学标定的 <strong className="text-blue-300 font-mono">MDC₉₅ 测量误差阈值</strong>，自动过滤测试噪声与测量误差，判定是否发生**真实提升**、**正常波动**或**真实超出误差下降**。
           </p>
         </div>
 
@@ -193,7 +193,7 @@ export const QuickVerdictView: React.FC<Props> = ({
               onClick={() => handleLoadPreset('drop')}
               className="px-2.5 py-1 bg-rose-950/80 hover:bg-rose-900 text-rose-300 border border-rose-700/50 rounded-lg text-xs font-medium transition"
             >
-              🔴 真实疲劳预警
+              🔴 真实超出误差下降
             </button>
           </div>
         </div>
@@ -522,17 +522,17 @@ export const QuickVerdictView: React.FC<Props> = ({
                   <div className="text-xs text-blue-950 leading-relaxed">
                     {evalResult.resultType === 'true_improvement' && (
                       <p>
-                        🟢 <strong>训练强化期：</strong> 运动员表现产生显著突破，神经肌肉机能处于良好适应状态。建议维持阶段性高强度专项负荷，或适度提高离心/向心负荷挑战。
+                        🟢 <strong>突破提升确认：</strong> 实测表现已超出 95% 最小真实变化阈值 (MDC₉₅)，确认为突破测试误差的真实表现提升。具体适应机制可结合阶段负荷及专项测试周期综合解释。
                       </p>
                     )}
                     {evalResult.resultType === 'within_noise' && (
                       <p>
-                        ⚪ <strong>负荷维持期：</strong> 表现波动属于测试日常正常误差，不建议因本次微小波动盲目调整训练计划。建议继续维持当前力量爆发力周周期安排。
+                        ⚪ <strong>正常误差范围：</strong> 表现波动处于预期测量误差带 (±MDC₉₅) 内，属于日常测试与生物学正常随机波动。不建议据此判定机能改变或盲目调整训练计划。
                       </p>
                     )}
                     {evalResult.resultType === 'true_decline' && (
                       <p>
-                        🔴 <strong>减量恢复预警：</strong> 表现跌破测量误差下限，高度提示中枢神经疲劳或过度积累负荷。建议：缩短下一次训练的离心爆发组数，增加筋膜放松与主动睡眠恢复。
+                        🔴 <strong>真实下降提示：</strong> 检测到超过预期测量误差的真实下降。注意：该变化不代表单一原因诊断，变化原因需结合训练负荷、RPE自觉疲劳度、睡眠质量、HRV心率变异度、肌肉酸痛与伤病情况综合解释。
                       </p>
                     )}
                   </div>

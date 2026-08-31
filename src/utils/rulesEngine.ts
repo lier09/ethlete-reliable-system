@@ -339,26 +339,26 @@ export function evaluateMetricReliability(
     tierLabel = '推荐用于纵向监控 (Tier 1 - Recommended)';
     isEligibleForReference = true;
     detailedRationale.push(
-      `核心信度指标全面达标：重复测量展现出优秀的相对信度 [ICC(A,1) = ${formatNum(stats.iccA1, 2)}] 与绝对精度 [CV = ${formatNum(stats.cvMean, 1)}%]，系统偏差极小 (Bias% = ${formatNum(biasPercent, 2)}% ≤ ${biasPassLimit}%)。在当前标准化测试方案下，MDC95 = ±${formatNum(stats.mdc95, 2)} ${stats.unit} (占均值 ${formatNum(stats.mdcPercent, 1)}%)。较低的MDC95和MDC%表明，该指标对超过测量误差的个体变化具有较好的检测能力，能够识别幅度超过MDC95的个体机能变化，推荐建立基准并作为日常纵向监控核心指标。`
+      `核心信度指标全面达标：重复测量展现出优秀的相对信度 [ICC(A,1) = ${formatNum(stats.iccA1, 2)}] 与绝对精度 [CV = ${formatNum(stats.cvMean, 1)}%]，系统偏差受控 (Bias% = ${formatNum(biasPercent, 2)}% ≤ ${biasPassLimit}%)。在当前标准化测试方案下，MDC95 = ±${formatNum(stats.mdc95, 2)} ${stats.unit} (占均值 ${formatNum(stats.mdcPercent, 1)}%)。该指标对超过测量误差的个体真实变化具有充分检测带宽，符合商用与科研准入规范，允许固化为 Reference 基准用于个体纵向监控。`
     );
   }
-  // Tier 2: Use with Caution (Has caution items, but no severe critical fails)
+  // Tier 2: Use with Caution (Has caution items, but no severe critical fails) - Prohibited from Reference
   else if (!hasCriticalFail) {
     tier = 'tier_2_caution';
-    tierLabel = '可采用但需谨慎 (Tier 2 - Use with Caution)';
-    isEligibleForReference = true; // Tier 2 allows Reference creation with caution warning
-    cautionWarning = 'Use with caution; interpret longitudinal changes together with other relevant metrics. (谨慎使用：该指标存在一定测量学限制，建议结合其他指标及实际情境解释)';
+    tierLabel = '可作科研探索但需谨慎 (Tier 2 - Exploration Only)';
+    isEligibleForReference = false; // Strictly prohibited from entering athlete monitoring references
+    cautionWarning = '指标存在信度或变异度边缘限制 (如样本量不足、置信区间较宽、MDC%偏大或存在中度系统偏差)。根据严格准入规范，Tier 2 严禁建立正式 Reference 用于日常个体监控，仅可保存为候选探索性分析。';
     detailedRationale.push(
-      `指标信度整体可用 (ICC = ${formatNum(stats.iccA1, 2)}, CV = ${formatNum(stats.cvMean, 1)}%)，但存在 ${cautionCount} 项边缘谨慎指标 (如样本量不足、置信区间较宽、MDC%偏大或存在 ${biasPassLimit}%~${biasCautionLimit}% 中度系统偏差)。系统允许建立基准参考值 (Reference)，但提示在日常监控中谨慎使用，纵向变化判定建议结合其他相关指标综合解释。`
+      `指标信度处于边缘可用范围 (ICC = ${formatNum(stats.iccA1, 2)}, CV = ${formatNum(stats.cvMean, 1)}%)，但检测到 ${cautionCount} 项边缘谨慎指标 (如样本量偏小、置信区间较宽、MDC%偏大或存在 ${biasPassLimit}%~${biasCautionLimit}% 中度系统偏差)。根据商用科研严谨性准入规则：Tier 2 指标禁止建立正式 Reference 用于个体纵向监控，仅允许作为科研探索性分析留存。若需应用于日常监控，请扩大样本量或优化测试协议后重新标定。`
     );
   }
   // Tier 3: Not Recommended as Primary Monitoring Metric (Has critical fail)
   else {
     tier = 'tier_3_not_recommended';
     tierLabel = '不推荐作为主要监控指标 (Tier 3 - Not Recommended)';
-    isEligibleForReference = false; // Strictly prohibited by default
+    isEligibleForReference = false; // Strictly prohibited
     detailedRationale.push(
-      `存在关键可靠性缺陷：指标测量噪声过大 (CV = ${formatNum(stats.cvMean, 1)}%)、相对信度不足 (ICC = ${formatNum(stats.iccA1, 2)})、MDC%过大 (${formatNum(stats.mdcPercent, 1)}%) 或存在 >${biasCautionLimit}% 严重系统偏差。微小的真实机能改变将被测试误差掩盖，系统禁止建立基准参考值，不适宜作为纵向机能疲劳与适应判定的主要指标。`
+      `存在关键可靠性缺陷：指标测量噪声过大 (CV = ${formatNum(stats.cvMean, 1)}%)、相对信度不足 (ICC = ${formatNum(stats.iccA1, 2)})、MDC%过大 (${formatNum(stats.mdcPercent, 1)}%) 或存在 >${biasCautionLimit}% 显著系统偏差。微小的真实机能改变将被测试误差完全掩盖，系统禁止建立基准参考值，不适宜作为纵向机能监控指标。`
     );
   }
 
@@ -422,28 +422,28 @@ export function calculateTrueChangeThreshold(
     if (currentValue > upperThreshold) {
       resultType = 'true_improvement';
       resultLabel = '真实升高 / 表现提升 (True Improvement)';
-      resultExplanation = `实测值较基线变化量 (+${formatNum(delta, 2)}) 超过 95% 最小真实变化阈值 (MDC₉₅ = ±${formatNum(mdc95, 2)})。该变化已超出预期测量误差；其训练、生理或表现意义仍需结合实际情境解释。`;
+      resultExplanation = `检测到超过预期测量误差的真实提升：实测值较基准提升 +${formatNum(delta, 2)}，超出 95% 最小真实变化阈值 (MDC₉₅ = ±${formatNum(mdc95, 2)})。确认为突破测试噪声的表现提升。`;
     } else if (currentValue < lowerThreshold) {
       resultType = 'true_decline';
-      resultLabel = '真实下降 / 表现衰退 (True Decline)';
-      resultExplanation = `实测值较基线变化量 (${formatNum(delta, 2)}) 跌破 95% 最小真实变化下限 (MDC₉₅ = ±${formatNum(mdc95, 2)})。该变化已超出预期测量误差；提示可能存在显著疲劳或机能下降，需结合训练负荷综合研判。`;
+      resultLabel = '真实下降 / 跌破误差下限 (True Decline)';
+      resultExplanation = `检测到超过预期测量误差的真实下降：实测值较基准下降 ${formatNum(Math.abs(delta), 2)}，跌破 95% 最小真实变化下限 (MDC₉₅ = ±${formatNum(mdc95, 2)})。变化原因需结合训练负荷、RPE、睡眠、HRV、酸痛和伤病情况解释。`;
     } else {
       resultType = 'within_noise';
-      resultLabel = '在预期测量误差范围内 (Within Measurement Error)';
-      resultExplanation = `变化量 (${delta >= 0 ? '+' : ''}${formatNum(delta, 2)}) 未超出 95% 最小真实变化阈值 (±${formatNum(mdc95, 2)})。属于正常测试与生物学随机波动范围，尚不能确证为超出误差的真实改变。`;
+      resultLabel = '在预期测量误差范围内 (Within Measurement Noise)';
+      resultExplanation = `变化量 (${delta >= 0 ? '+' : ''}${formatNum(delta, 2)}) 处于 95% 最小真实变化阈值 (±${formatNum(mdc95, 2)}) 范围内。该波动属于预期测量误差与日常生物学正常波动，尚不能确认为真实机能改变。`;
     }
   } else if (direction === 'lower_is_better') {
     if (currentValue < lowerThreshold) {
       resultType = 'true_improvement';
       resultLabel = '真实缩短 / 表现提升 (True Improvement)';
-      resultExplanation = `实测用时/测试值缩短 ${formatNum(Math.abs(delta), 2)}，已超出 95% 最小真实变化阈值 (MDC₉₅ = ±${formatNum(mdc95, 2)})。该变化已超出预期测量误差，可信确认为能力提升。`;
+      resultExplanation = `检测到超过预期测量误差的真实提升：实测用时/数值缩短 ${formatNum(Math.abs(delta), 2)}，超出 95% 最小真实变化阈值 (MDC₉₅ = ±${formatNum(mdc95, 2)})。确认为突破测试噪声的表现提升。`;
     } else if (currentValue > upperThreshold) {
       resultType = 'true_decline';
-      resultLabel = '真实增加 / 表现衰退 (True Decline)';
-      resultExplanation = `实测用时/测试值增加 +${formatNum(delta, 2)}，已超出 95% 误差阈值 (MDC₉₅ = ±${formatNum(mdc95, 2)})。该变化超出预期测量误差，提示测试表现出现真实衰退或存在疲劳积累。`;
+      resultLabel = '真实增加 / 跌破误差下限 (True Decline)';
+      resultExplanation = `检测到超过预期测量误差的真实下降：实测用时/数值增加 +${formatNum(delta, 2)}，超出 95% 误差阈值 (MDC₉₅ = ±${formatNum(mdc95, 2)})。变化原因需结合训练负荷、RPE、睡眠、HRV、酸痛和伤病情况解释。`;
     } else {
       resultType = 'within_noise';
-      resultLabel = '在预期测量误差范围内 (Within Measurement Error)';
+      resultLabel = '在预期测量误差范围内 (Within Measurement Noise)';
       resultExplanation = `变化量 (${delta >= 0 ? '+' : ''}${formatNum(delta, 2)}) 处于预期测量误差 (±${formatNum(mdc95, 2)}) 范围之内，属于正常测试波动。`;
     }
   } else {
@@ -451,15 +451,15 @@ export function calculateTrueChangeThreshold(
     if (currentValue > upperThreshold) {
       resultType = 'true_change_neutral';
       resultLabel = '真实升高 (True Increase)';
-      resultExplanation = `实测值升高 +${formatNum(delta, 2)}，已超出 95% 测量误差阈值 (±${formatNum(mdc95, 2)})。该变化超出预期测量误差，具体影响需结合实际情境分析。`;
+      resultExplanation = `检测到超过预期测量误差的真实升高：实测值较基线升高 +${formatNum(delta, 2)}，超出 95% 测量误差阈值 (±${formatNum(mdc95, 2)})。具体影响需结合实际专项情境综合解释。`;
     } else if (currentValue < lowerThreshold) {
       resultType = 'true_change_neutral';
       resultLabel = '真实降低 (True Decrease)';
-      resultExplanation = `实测值降低 ${formatNum(delta, 2)}，已超出 95% 测量误差阈值 (±${formatNum(mdc95, 2)})。该变化超出预期测量误差，具体影响需结合实际情境分析。`;
+      resultExplanation = `检测到超过预期测量误差的真实降低：实测值较基线降低 ${formatNum(delta, 2)}，超出 95% 测量误差阈值 (±${formatNum(mdc95, 2)})。具体影响需结合实际专项情境综合解释。`;
     } else {
       resultType = 'within_noise';
-      resultLabel = '在预期测量误差范围内 (Within Measurement Error)';
-      resultExplanation = `变化量在正常预期测试误差之内。`;
+      resultLabel = '在预期测量误差范围内 (Within Measurement Noise)';
+      resultExplanation = `变化量在正常预期测量误差范围之内。`;
     }
   }
 
