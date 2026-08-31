@@ -1,42 +1,44 @@
 {
   "dataset_id": "GOLD-06-EXTREMELY-LOW-CV",
-  "engine": "Python-Scientific-Validation-Engine",
-  "python_version": "3.10.12",
-  "framework_equivalent": "pingouin.intraclass_corr(targets='participant', raters='session', ratings='val') -> ICC2 (Two-way mixed single absolute agreement)",
+  "engine": "Python-NumPy-SciPy-Independent-Validation",
+  "python_version": "3.14.5",
+  "packages": {
+    "numpy": "2.4.6",
+    "scipy": "1.18.0"
+  },
   "model_specification": {
-    "design": "Two-way mixed effects ANOVA",
-    "definition": "Absolute Agreement",
-    "measure": "Single score ICC(A,1)",
-    "ci_method": "McGraw & Wong (1996) exact F-distribution",
-    "sem_method": "Weir (2005) pooled_sd * sqrt(1 - ICC)",
-    "te_method": "Hopkins (2000) sd_diff / sqrt(2)"
+    "design": "Two-way random-effects ANOVA",
+    "definition": "Absolute agreement",
+    "measure": "Single score ICC(A,1) / ICC(2,1)",
+    "ci_method": "McGraw & Wong exact F-distribution; scipy.stats.f.ppf",
+    "independent_primary_reference": "R irr::icc(model='twoway', type='agreement', unit='single')"
   },
   "results": {
     "n": 10,
     "t1_mean": 75.89,
     "t2_mean": 75.91,
     "grand_mean": 75.9,
-    "mean_bias": 0.02,
-    "sd_diff": 0.10328,
-    "typical_error": 0.07303,
-    "cv_percent": 0.096218,
-    "pooled_sd": 5.739231,
-    "icc_a1": 0.999848,
-    "icc_a1_lower95": 0.858234,
-    "icc_a1_upper95": 1.0,
-    "sem": 0.070711,
-    "mdc95": 0.196001,
-    "mdc_percent": 0.258236,
-    "loa_lower": -0.182428,
-    "loa_upper": 0.222428,
+    "mean_bias": 0.020000000000001704,
+    "sd_diff": 0.10327955589886409,
+    "typical_error": 0.07302967433402188,
+    "cv_percent": 0.09621827975496954,
+    "pooled_sd": 5.739231462293342,
+    "icc_a1": 0.9998482016960932,
+    "icc_a1_lower95": 0.9993889918903403,
+    "icc_a1_upper95": 0.9999622934409043,
+    "sem": 0.0707110359097408,
+    "mdc95": 0.19599739018207435,
+    "mdc_percent": 0.2582310806087936,
+    "loa_lower": -0.18242421149775956,
+    "loa_upper": 0.22242421149776298,
     "anova_table": {
-      "ms_rows": 65.872222,
-      "ms_cols": 0.002,
-      "ms_error": 0.005333,
+      "ms_rows": 65.8722222222222,
+      "ms_columns": 0.001999999999999204,
+      "ms_error": 0.005333333333328369,
       "df_rows": 9,
-      "df_cols": 1,
+      "df_columns": 1,
       "df_error": 9
     }
   },
-  "timestamp": "2026-08-31T04:12:13.608060"
+  "timestamp": "2026-08-31T04:44:14.711065+00:00"
 }

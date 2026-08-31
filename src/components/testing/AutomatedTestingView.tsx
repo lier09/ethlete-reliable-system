@@ -190,7 +190,7 @@ export const AutomatedTestingView: React.FC = () => {
     });
 
     // -------------------------------------------------------------
-    // Test 8: Two-Way Mixed Effects ANOVA & ICC(A,1)
+    // Test 8: Two-Way Random Effects ANOVA & ICC(A,1)
     // -------------------------------------------------------------
     const tStart8 = performance.now();
     const pairs: AggregatedPairData[] = [
@@ -203,7 +203,7 @@ export const AutomatedTestingView: React.FC = () => {
     const isAnovaValid = anova.dfRow === 3 && anova.msRow > anova.msError;
     testList.push({
       id: 'TEST-ANOVA-08',
-      name: '双因素混合效应 ANOVA 方差分析分解检验',
+      name: '双因素随机效应 ANOVA 方差分析分解检验',
       category: 'anova',
       description: '验证行间均方 (msRow)、列间均方 (msCol) 与误差均方 (msError) 的正确分解',
       passed: isAnovaValid,
@@ -218,17 +218,17 @@ export const AutomatedTestingView: React.FC = () => {
     const tStart9 = performance.now();
     const iccResult = calculateICC(pairs);
     const isIccValid =
-      iccResult.iccModel === 'two_way_mixed' &&
+      iccResult.iccModel === 'two_way_random' &&
       iccResult.iccDefinition === 'absolute_agreement' &&
-      iccResult.iccA1 >= 0 &&
+      iccResult.iccA1 >= -1 &&
       iccResult.iccA1 <= 1;
     testList.push({
       id: 'TEST-ICC-09',
       name: 'ICC(A,1) 绝对一致性信度系数检验',
       category: 'anova',
-      description: '验证两因素混合效应单测量绝对一致性 ICC(A,1) 计算符合 McGraw & Wong (1996) 与 Shrout & Fleiss (1979)',
+      description: '验证两因素随机效应、单次测量、绝对一致性 ICC(A,1)/ICC(2,1) 计算符合 McGraw & Wong (1996) 与 Shrout & Fleiss (1979)',
       passed: isIccValid,
-      expected: 'ICC(A,1) in [0, 1], model="two_way_mixed", def="absolute_agreement"',
+      expected: 'ICC(A,1) in [-1, 1], model="two_way_random", def="absolute_agreement"',
       actual: `ICC(A,1) = ${iccResult.iccA1.toFixed(3)}, model="${iccResult.iccModel}", def="${iccResult.iccDefinition}"`,
       durationMs: +(performance.now() - tStart9).toFixed(2)
     });
@@ -585,7 +585,7 @@ export const AutomatedTestingView: React.FC = () => {
             严谨性统计校验与单元测试矩阵 (18 项全检)
           </h2>
           <p className="text-xs text-slate-500 mt-1">
-            覆盖 TE、CV、SEM、MDC95、Systematic Bias、Bland-Altman、Two-Way Mixed ICC、N=1 守门器及双向监控判定。
+            覆盖 TE、CV、SEM、MDC95、Systematic Bias、Bland-Altman、Two-Way Random ICC、N=1 守门器及双向监控判定。
           </p>
         </div>
 

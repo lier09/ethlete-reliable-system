@@ -114,6 +114,24 @@ export interface ParseResult {
   ignoredCount: number;
 }
 
+function parseFiniteNumber(value: string | undefined): number {
+  if (value === undefined || value.trim() === '') return NaN;
+  const parsed = Number(value.trim());
+  return Number.isFinite(parsed) ? parsed : NaN;
+}
+
+function parsePositiveInteger(value: string | undefined): number {
+  if (value === undefined || !/^\+?\d+$/.test(value.trim())) return NaN;
+  const parsed = Number(value.trim());
+  return Number.isSafeInteger(parsed) && parsed > 0 ? parsed : NaN;
+}
+
+function parseOptionalFiniteNumber(value: string | undefined): number | undefined {
+  if (value === undefined || value.trim() === '') return undefined;
+  const parsed = parseFiniteNumber(value);
+  return Number.isFinite(parsed) ? parsed : undefined;
+}
+
 /**
  * Parses CSV or tab-delimited text into structured RawDataRow objects with comprehensive error auditing.
  * Never silently drops rows - all malformed rows are audited into parseErrors.
@@ -164,8 +182,8 @@ export function parseCSVData(text: string): ParseResult {
       const metric = metricIdx !== -1 && cells[metricIdx] ? cells[metricIdx].trim() : 'Default Metric';
       const t1Raw = cells[t1Idx];
       const t2Raw = cells[t2Idx];
-      const t1Val = parseFloat(t1Raw);
-      const t2Val = parseFloat(t2Raw);
+      const t1Val = parseFiniteNumber(t1Raw);
+      const t2Val = parseFiniteNumber(t2Raw);
 
       if (isNaN(t1Val) && isNaN(t2Val)) {
         const reason = `第 ${lineNum} 行受试者 ${pid} 的 Test 1 ("${t1Raw}") 和 Test 2 ("${t2Raw}") 均为非有效数值`;
@@ -185,7 +203,7 @@ export function parseCSVData(text: string): ParseResult {
         rows.push({
           participant_id: pid,
           name,
-          age: ageIdx !== -1 && cells[ageIdx] ? parseFloat(cells[ageIdx]) : undefined,
+          age: ageIdx !== -1 ? parseOptionalFiniteNumber(cells[ageIdx]) : undefined,
           sex: sexIdx !== -1 ? cells[sexIdx] : undefined,
           session: 1,
           trial: 1,
@@ -207,7 +225,7 @@ export function parseCSVData(text: string): ParseResult {
         rows.push({
           participant_id: pid,
           name,
-          age: ageIdx !== -1 && cells[ageIdx] ? parseFloat(cells[ageIdx]) : undefined,
+          age: ageIdx !== -1 ? parseOptionalFiniteNumber(cells[ageIdx]) : undefined,
           sex: sexIdx !== -1 ? cells[sexIdx] : undefined,
           session: 2,
           trial: 1,
@@ -244,11 +262,11 @@ export function parseCSVData(text: string): ParseResult {
       const name = (nameIdx !== -1 && cells[nameIdx]) ? cells[nameIdx].trim() : pid;
       const sessionRaw = sessionIdx !== -1 ? cells[sessionIdx] : '1';
       const trialRaw = trialIdx !== -1 ? cells[trialIdx] : '1';
-      const sessionVal = parseInt(sessionRaw, 10);
-      const trialVal = parseInt(trialRaw, 10);
+      const sessionVal = parsePositiveInteger(sessionRaw);
+      const trialVal = parsePositiveInteger(trialRaw);
       const metric = (metricIdx !== -1 && cells[metricIdx]) ? cells[metricIdx].trim() : 'Test Metric';
       const valStr = valueIdx !== -1 ? cells[valueIdx] : '';
-      const val = parseFloat(valStr);
+      const val = parseFiniteNumber(valStr);
 
       if (isNaN(val)) {
         const reason = `第 ${lineNum} 行受试者 "${pid}" 指标 "${metric}" 的数值 "${valStr}" 无法转换为有效浮点数`;
@@ -285,7 +303,7 @@ export function parseCSVData(text: string): ParseResult {
       rows.push({
         participant_id: pid,
         name,
-        age: ageIdx !== -1 && cells[ageIdx] ? parseFloat(cells[ageIdx]) : undefined,
+        age: ageIdx !== -1 ? parseOptionalFiniteNumber(cells[ageIdx]) : undefined,
         sex: sexIdx !== -1 ? cells[sexIdx] : undefined,
         session: sessionVal,
         trial: trialVal,
@@ -443,6 +461,14 @@ export function qualifyDataset(
     };
   }
 
+  if (rows.some(row => !Number.isFinite(row.value))) {
+    issues.push({
+      type: 'error',
+      code: 'NON_FINITE_VALUES',
+      message: '检测到 NaN、Infinity 或其他非有限测试值。请修正数据后再进行可靠性分析。'
+    });
+  }
+
   // Unique subjects
   const participants = Array.from(new Set(rows.map(r => r.participant_id)));
   const totalParticipants = participants.length;
@@ -505,9 +531,9 @@ export function qualifyDataset(
   }
   if (duplicateCount > 0) {
     issues.push({
-      type: 'warning',
+      type: 'error',
       code: 'DUPLICATE_RECORDS_DETECTED',
-      message: `检测到 ${duplicateCount} 条重复录入的记录 (相同受试者、轮次、试次与指标)，请检查数据源。`
+      message: `检测到 ${duplicateCount} 条重复录入的记录（相同受试者、轮次、试次与指标）。重复记录会改变聚合值，系统已拦截分析；请去重或明确修正试次编号。`
     });
   }
 

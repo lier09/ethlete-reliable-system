@@ -676,7 +676,7 @@ export const ReliabilityLabView: React.FC<Props> = ({
                   </p>
                   <p className="text-xs text-rose-800 mt-2 leading-relaxed">
                     <strong>统计学根基解释：</strong>
-                    组内相关系数 (ICC)、典型误差 (TE) 及 MDC95 的本质是利用群体重复测试数据进行两因素随机方差分解 (Two-Way Mixed ANOVA)。
+                    组内相关系数 (ICC)、典型误差 (TE) 及 MDC95 的本质是利用群体重复测试数据进行两因素随机效应方差分解 (Two-Way Random-Effects ANOVA)。
                     单一个人仅有两次测试，无法区分受试者间真实变异与测试随机误差，因此在数学上完全不具备建立可靠性基准的前提条件。
                   </p>
                 </div>

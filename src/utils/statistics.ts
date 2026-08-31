@@ -489,7 +489,7 @@ export function calculatePooledSD(
 }
 
 /**
- * 2.7 Two-Way Mixed ANOVA for ICC decomposition
+ * 2.7 Two-Way ANOVA decomposition for ICC(A,1) / ICC(2,1)
  */
 export interface ANOVA2WayResult {
   ssTotal: number;
@@ -549,7 +549,7 @@ export function calculateANOVA2Way(pairs: AggregatedPairData[]): ANOVA2WayResult
 
 /**
  * 2.8 Calculate Intraclass Correlation Coefficient (ICC)
- * Model: Two-Way Mixed Effects, Single Measure (k=2)
+ * Model: Two-Way Random Effects, Single Measure (k=2)
  * Absolute Agreement: ICC(A,1)
  * Consistency: ICC(C,1)
  * Confidence Interval: McGraw & Wong (1996) / Shrout & Fleiss (1979)
@@ -566,7 +566,7 @@ export function calculateICC(
   iccC1Lower95: number;
   iccC1Upper95: number;
   anova: ANOVA2WayResult;
-  iccModel: 'two_way_mixed';
+  iccModel: 'two_way_random';
   iccDefinition: 'absolute_agreement';
   iccMeasureType: 'single';
 } {
@@ -636,7 +636,7 @@ export function calculateICC(
     iccC1Lower95,
     iccC1Upper95,
     anova,
-    iccModel: 'two_way_mixed',
+    iccModel: 'two_way_random',
     iccDefinition: 'absolute_agreement',
     iccMeasureType: 'single'
   };
@@ -796,7 +796,7 @@ export function calculateReliability(
   // 5. CV% (TE / grandMean * 100)
   const cvStats = calculateCV(teStats.typicalError, grandMean, n, confidenceLevel);
 
-  // 6. Two-Way Mixed ANOVA & ICC (ICC(A,1) and ICC(C,1))
+  // 6. Two-Way ANOVA & ICC (primary absolute-agreement ICC(A,1), secondary ICC(C,1))
   const iccStats = calculateICC(pairs, confidenceLevel);
 
   // 7. Pooled SD

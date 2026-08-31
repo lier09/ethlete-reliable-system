@@ -109,6 +109,35 @@ P3,0,1,CMJ,35.0
     expect(qualification.issues.some(i => i.code === 'PARSING_MALFORMED_DATA')).toBe(true);
   });
 
+  it('Rejects partially numeric, infinite, and non-integer control fields', () => {
+    const csvWithUnsafeNumbers = `participant_id,session,trial,metric,value
+P1,1,1,CMJ,40cm
+P1,2abc,1,CMJ,42
+P2,1,1.5,CMJ,38
+P2,2,1,CMJ,Infinity
+`;
+    const parseRes = parseCSVData(csvWithUnsafeNumbers);
+    expect(parseRes.rows).toHaveLength(0);
+    expect(parseRes.parseErrors).toHaveLength(4);
+    expect(parseRes.errors.some(error => error.includes('40cm'))).toBe(true);
+    expect(parseRes.errors.some(error => error.includes('Infinity'))).toBe(true);
+  });
+
+  it('Hard-stops duplicate observations because they alter trial aggregation', () => {
+    const duplicateRows = [
+      { participant_id: 'P1', session: 1, trial: 1, metric: 'CMJ', value: 40 },
+      { participant_id: 'P1', session: 1, trial: 1, metric: 'CMJ', value: 41 },
+      { participant_id: 'P1', session: 2, trial: 1, metric: 'CMJ', value: 42 },
+      { participant_id: 'P2', session: 1, trial: 1, metric: 'CMJ', value: 38 },
+      { participant_id: 'P2', session: 2, trial: 1, metric: 'CMJ', value: 39 }
+    ];
+    const qualification = qualifyDataset(duplicateRows);
+    expect(qualification.canProceedToReliability).toBe(false);
+    expect(qualification.issues).toEqual(expect.arrayContaining([
+      expect.objectContaining({ type: 'error', code: 'DUPLICATE_RECORDS_DETECTED' })
+    ]));
+  });
+
   it('Allows selection between any two sessions in multi-session data', () => {
     const threeSessionData = [
       { participant_id: 'P1', session: 1, trial: 1, metric: 'CMJ', value: 40 },

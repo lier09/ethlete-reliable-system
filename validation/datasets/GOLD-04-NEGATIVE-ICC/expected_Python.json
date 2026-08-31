@@ -1,42 +1,44 @@
 {
   "dataset_id": "GOLD-04-NEGATIVE-ICC",
-  "engine": "Python-Scientific-Validation-Engine",
-  "python_version": "3.10.12",
-  "framework_equivalent": "pingouin.intraclass_corr(targets='participant', raters='session', ratings='val') -> ICC2 (Two-way mixed single absolute agreement)",
+  "engine": "Python-NumPy-SciPy-Independent-Validation",
+  "python_version": "3.14.5",
+  "packages": {
+    "numpy": "2.4.6",
+    "scipy": "1.18.0"
+  },
   "model_specification": {
-    "design": "Two-way mixed effects ANOVA",
-    "definition": "Absolute Agreement",
-    "measure": "Single score ICC(A,1)",
-    "ci_method": "McGraw & Wong (1996) exact F-distribution",
-    "sem_method": "Weir (2005) pooled_sd * sqrt(1 - ICC)",
-    "te_method": "Hopkins (2000) sd_diff / sqrt(2)"
+    "design": "Two-way random-effects ANOVA",
+    "definition": "Absolute agreement",
+    "measure": "Single score ICC(A,1) / ICC(2,1)",
+    "ci_method": "McGraw & Wong exact F-distribution; scipy.stats.f.ppf",
+    "independent_primary_reference": "R irr::icc(model='twoway', type='agreement', unit='single')"
   },
   "results": {
     "n": 6,
     "t1_mean": 20.0,
     "t2_mean": 20.0,
-    "grand_mean": 20.0,
+    "grand_mean": 20.000000000000004,
     "mean_bias": 0.0,
-    "sd_diff": 6.153048,
-    "typical_error": 4.350862,
-    "cv_percent": 21.75431,
-    "pooled_sd": 4.273172,
-    "icc_a1": -0.044356,
+    "sd_diff": 6.153048025166064,
+    "typical_error": 4.350861983561418,
+    "cv_percent": 21.75430991780709,
+    "pooled_sd": 4.273172123844299,
+    "icc_a1": -0.04435617345249965,
     "icc_a1_lower95": -1.0,
-    "icc_a1_upper95": 0.998208,
-    "sem": 4.366915,
-    "mdc95": 12.10447,
-    "mdc_percent": 60.52235,
-    "loa_lower": -12.059974,
-    "loa_upper": 12.059974,
+    "icc_a1_upper95": 0.7719137338830938,
+    "sem": 4.366914669104795,
+    "mdc95": 12.104247481042089,
+    "mdc_percent": 60.521237405210435,
+    "loa_lower": -12.05975261959658,
+    "loa_upper": 12.05975261959658,
     "anova_table": {
-      "ms_rows": 17.59,
-      "ms_cols": 0.0,
-      "ms_error": 18.93,
+      "ms_rows": 17.589999999999993,
+      "ms_columns": 1.5146129380243427e-28,
+      "ms_error": 18.930000000000007,
       "df_rows": 5,
-      "df_cols": 1,
+      "df_columns": 1,
       "df_error": 5
     }
   },
-  "timestamp": "2026-08-31T04:12:13.458797"
+  "timestamp": "2026-08-31T04:44:14.709785+00:00"
 }

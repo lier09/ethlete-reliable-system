@@ -44,7 +44,7 @@ export const HelpModal: React.FC<Props> = ({ isOpen, onClose }) => {
             </p>
             <div className="bg-white/80 p-3 rounded border border-blue-200 font-mono text-xs text-blue-900 space-y-1">
               <div>Cohort Test–Retest (群体重复测试数据, 建议 n ≥ 10)</div>
-              <div>&nbsp;↳ Reliability Analysis (两因素混合方差分析、典型误差、CV%、MDC95)</div>
+              <div>&nbsp;↳ Reliability Analysis (两因素随机方差分析、典型误差、CV%、MDC95)</div>
               <div>&nbsp;&nbsp;↳ Monitoring Suitability Evaluation (多维度监控适用性三级分级评估)</div>
               <div>&nbsp;&nbsp;&nbsp;↳ Reliability Reference (固化特定人群×设备×协议的参考基准)</div>
               <div>&nbsp;&nbsp;&nbsp;&nbsp;↳ Individual Athlete Monitoring (输入基线与当前值，判定是否突破测量误差)</div>
@@ -64,7 +64,7 @@ export const HelpModal: React.FC<Props> = ({ isOpen, onClose }) => {
               <div className="border border-slate-200 rounded-lg p-3 bg-slate-50">
                 <div className="font-semibold text-slate-900 mb-1">1. 两因素绝对一致性 ICC(A,1)</div>
                 <div className="text-xs text-slate-600 mb-2">
-                  Two-way mixed single-measure intra-class correlation coefficient:
+                  Two-way random-effects, single-measure, absolute-agreement intraclass correlation coefficient:
                 </div>
                 <div className="bg-white p-2 rounded border border-slate-200 font-mono text-xs">
                   ICC(A,1) = (MS_R - MS_E) / [MS_R + (k-1)MS_E + (k/n)(MS_C - MS_E)]

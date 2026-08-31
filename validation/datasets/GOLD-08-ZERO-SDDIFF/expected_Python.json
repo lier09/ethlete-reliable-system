@@ -1,15 +1,17 @@
 {
   "dataset_id": "GOLD-08-ZERO-SDDIFF",
-  "engine": "Python-Scientific-Validation-Engine",
-  "python_version": "3.10.12",
-  "framework_equivalent": "pingouin.intraclass_corr(targets='participant', raters='session', ratings='val') -> ICC2 (Two-way mixed single absolute agreement)",
+  "engine": "Python-NumPy-SciPy-Independent-Validation",
+  "python_version": "3.14.5",
+  "packages": {
+    "numpy": "2.4.6",
+    "scipy": "1.18.0"
+  },
   "model_specification": {
-    "design": "Two-way mixed effects ANOVA",
-    "definition": "Absolute Agreement",
-    "measure": "Single score ICC(A,1)",
-    "ci_method": "McGraw & Wong (1996) exact F-distribution",
-    "sem_method": "Weir (2005) pooled_sd * sqrt(1 - ICC)",
-    "te_method": "Hopkins (2000) sd_diff / sqrt(2)"
+    "design": "Two-way random-effects ANOVA",
+    "definition": "Absolute agreement",
+    "measure": "Single score ICC(A,1) / ICC(2,1)",
+    "ci_method": "McGraw & Wong exact F-distribution; scipy.stats.f.ppf",
+    "independent_primary_reference": "R irr::icc(model='twoway', type='agreement', unit='single')"
   },
   "results": {
     "n": 8,
@@ -20,23 +22,23 @@
     "sd_diff": 0.0,
     "typical_error": 0.0,
     "cv_percent": 0.0,
-    "pooled_sd": 12.247449,
-    "icc_a1": 0.986842,
-    "icc_a1_lower95": 0.999998,
-    "icc_a1_upper95": 1.0,
-    "sem": 1.404879,
-    "mdc95": 3.894125,
-    "mdc_percent": 10.114611,
+    "pooled_sd": 12.24744871391589,
+    "icc_a1": 0.9868421052631579,
+    "icc_a1_lower95": 0.9375596613856408,
+    "icc_a1_upper95": 0.997337722126307,
+    "sem": 1.4048787173725432,
+    "mdc95": 3.8940535743081557,
+    "mdc_percent": 10.114424868332872,
     "loa_lower": 2.0,
     "loa_upper": 2.0,
     "anova_table": {
       "ms_rows": 300.0,
-      "ms_cols": 16.0,
+      "ms_columns": 16.0,
       "ms_error": 0.0,
       "df_rows": 7,
-      "df_cols": 1,
+      "df_columns": 1,
       "df_error": 7
     }
   },
-  "timestamp": "2026-08-31T04:12:13.736419"
+  "timestamp": "2026-08-31T04:44:14.712395+00:00"
 }

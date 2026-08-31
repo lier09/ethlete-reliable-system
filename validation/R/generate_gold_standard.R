@@ -46,7 +46,7 @@ for (dir in dataset_dirs) {
   
   # --------------------------------------------------------------------------
   # 1. ICC Model Execution via irr::icc
-  # Model: "twoway" (Two-way mixed effects ANOVA model)
+  # Model: "twoway" (Two-way random-effects model for absolute agreement)
   # Type: "agreement" (Absolute agreement definition: includes systematic column variance in denominator)
   # Unit: "single" (Single measure reliability ICC(A,1))
   # --------------------------------------------------------------------------
@@ -61,7 +61,7 @@ for (dir in dataset_dirs) {
   # --------------------------------------------------------------------------
   # 2. ICC Verification via psych::ICC
   # In psych::ICC output table, row 'ICC2' corresponds to:
-  # "Two-way mixed effects, single rater, absolute agreement" [ICC(A,1) in McGraw & Wong 1996].
+  # "Two-way random effects, single rater, absolute agreement" [ICC(A,1) / ICC(2,1)].
   # Note: psych::ICC labels row ICC3 as "Two-way mixed, consistency", NOT absolute agreement.
   # --------------------------------------------------------------------------
   icc_psych <- psych::ICC(ratings_mat)
@@ -107,9 +107,9 @@ for (dir in dataset_dirs) {
     packages = list(irr = irr_version, psych = psych_version),
     icc_model_spec = list(
       irr_call = "irr::icc(ratings_mat, model='twoway', type='agreement', unit='single', conf.level=0.95)",
-      psych_row = "ICC2 (Two-way mixed single rater absolute agreement)",
+      psych_row = "ICC2 (Two-way random single-rater absolute agreement)",
       mcgraw_wong_notation = "ICC(A,1)",
-      shrout_fleiss_notation = "ICC(2,1) or ICC(3,1) with column variance"
+      shrout_fleiss_notation = "ICC(2,1)"
     ),
     results = list(
       n = n,

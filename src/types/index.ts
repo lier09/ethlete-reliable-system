@@ -114,14 +114,14 @@ export interface ReliabilityStats {
   pairedTPValue: number;
   hasSignificantBias: boolean;
   // ICC Metadata & Values
-  iccModel: 'two_way_mixed';
+  iccModel: 'two_way_random';
   iccDefinition: 'absolute_agreement' | 'consistency';
   iccMeasureType: 'single';
   iccCiMethod: 'mcgraw_wong_1996';
-  iccA1: number; // Two-way mixed, single measure, absolute agreement
+  iccA1: number; // Two-way random, single measure, absolute agreement: ICC(A,1) / ICC(2,1)
   iccA1Lower95: number;
   iccA1Upper95: number;
-  iccC1: number; // Two-way mixed, single measure, consistency
+  iccC1: number; // Secondary consistency estimate from the same two-way ANOVA
   iccC1Lower95: number;
   iccC1Upper95: number;
   // Typical Error (TE)
@@ -208,7 +208,7 @@ export interface ReliabilityReference {
   trialsPerSession: number;
   trialAggregation: TrialAggregationMethod;
   // ICC Metadata & Values
-  iccModel: string; // 'two_way_mixed'
+  iccModel: string; // 'two_way_random'
   iccDefinition: string; // 'absolute_agreement'
   iccMeasureType: string; // 'single'
   iccCiMethod: string; // 'mcgraw_wong_1996'

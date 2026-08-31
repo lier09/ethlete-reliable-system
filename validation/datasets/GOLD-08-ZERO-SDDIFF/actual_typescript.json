@@ -9,6 +9,7 @@
     "t2_mean": 39.5,
     "grand_mean": 38.5,
     "mean_bias": 2,
+    "sd_diff": 0,
     "typical_error": 0,
     "cv_percent": 0,
     "pooled_sd": 12.24744871391589,
@@ -20,6 +21,5 @@
     "mdc_percent": 10.114424948114166,
     "loa_lower": 2,
     "loa_upper": 2
-  },
-  "timestamp": "2026-08-31T04:12:06.758Z"
+  }
 }

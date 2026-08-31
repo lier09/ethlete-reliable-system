@@ -13,6 +13,9 @@ interface ComparisonMetric {
   python_calculated: number | null;
   diff_ts_vs_r: number | null;
   diff_ts_vs_python: number | null;
+  tolerance_vs_r: number;
+  tolerance_vs_python: number;
+  passed: boolean;
 }
 
 interface DatasetComparison {
@@ -23,6 +26,8 @@ interface DatasetComparison {
 const summary: DatasetComparison[] = [];
 
 let maxDiffIcc = 0;
+let maxDiffIccLower = 0;
+let maxDiffIccUpper = 0;
 let maxDiffTe = 0;
 let maxDiffCv = 0;
 let maxDiffSem = 0;
@@ -45,6 +50,8 @@ folders.forEach((folder) => {
 
   const metricKeys = [
     { key: 'icc_a1', name: 'ICC(A,1)' },
+    { key: 'icc_a1_lower95', name: 'ICC(A,1) 95% CI Lower' },
+    { key: 'icc_a1_upper95', name: 'ICC(A,1) 95% CI Upper' },
     { key: 'typical_error', name: 'Typical Error (TE)' },
     { key: 'cv_percent', name: 'CV%' },
     { key: 'sem', name: 'SEM' },
@@ -63,6 +70,8 @@ folders.forEach((folder) => {
     const diffPy = tsVal !== null && pyVal !== null ? Math.abs(tsVal - pyVal) : null;
 
     if (key === 'icc_a1' && diffR !== null) maxDiffIcc = Math.max(maxDiffIcc, diffR);
+    if (key === 'icc_a1_lower95' && diffR !== null) maxDiffIccLower = Math.max(maxDiffIccLower, diffR);
+    if (key === 'icc_a1_upper95' && diffR !== null) maxDiffIccUpper = Math.max(maxDiffIccUpper, diffR);
     if (key === 'typical_error' && diffR !== null) maxDiffTe = Math.max(maxDiffTe, diffR);
     if (key === 'cv_percent' && diffR !== null) maxDiffCv = Math.max(maxDiffCv, diffR);
     if (key === 'sem' && diffR !== null) maxDiffSem = Math.max(maxDiffSem, diffR);
@@ -76,6 +85,9 @@ folders.forEach((folder) => {
       python_calculated: pyVal,
       diff_ts_vs_r: diffR,
       diff_ts_vs_python: diffPy,
+      tolerance_vs_r: 5e-4,
+      tolerance_vs_python: 5e-5,
+      passed: diffR !== null && diffPy !== null && diffR <= 5e-4 && diffPy <= 5e-5,
     };
   });
 
@@ -88,10 +100,12 @@ folders.forEach((folder) => {
 const report = {
   title: 'Gold Standard Independent Cross-Validation Report',
   primary_gold_standard: 'R (irr version 0.84.1 & psych version 2.4.3)',
-  secondary_validation_engine: 'Python SciPy / Pingouin equivalent implementation',
+  secondary_validation_engine: 'Independent Python NumPy/SciPy implementation (no Pingouin execution claim)',
   typescript_engine: 'TypeScript statistics.ts v1.0.0',
   summary_max_absolute_differences: {
     max_icc_point_diff: maxDiffIcc,
+    max_icc_lower95_diff: maxDiffIccLower,
+    max_icc_upper95_diff: maxDiffIccUpper,
     max_typical_error_diff: maxDiffTe,
     max_cv_percent_diff: maxDiffCv,
     max_sem_diff: maxDiffSem,
@@ -99,6 +113,7 @@ const report = {
     max_mean_bias_diff: maxDiffBias,
   },
   datasets_evaluated: summary.length,
+  validation_passed: summary.length > 0 && summary.every(dataset => dataset.metrics.every(metric => metric.passed)),
   datasets: summary,
   timestamp: new Date().toISOString(),
 };
@@ -112,27 +127,31 @@ fs.writeFileSync(
 // Create Markdown documentation
 const mdContent = `# Gold Standard Cross-Validation Evidence & Benchmark Documentation
 
+**Validation status: ${report.validation_passed ? 'PASS' : 'FAIL'}** — all listed metrics, including ICC 95% confidence limits, must remain within the declared tolerances.
+
 ## 1. Primary Gold Standard Environment
 - **Primary Standard**: GNU R Statistical Environment (v4.3+)
   - \`irr\` (v0.84.1): \`irr::icc(ratings, model = "twoway", type = "agreement", unit = "single", conf.level = 0.95)\`
   - \`psych\` (v2.4.3): \`psych::ICC(ratings)$results["ICC2", ]\`
-- **Secondary Engine**: Python 3.10+ with equivalent \`scipy.stats\` / \`pingouin\` (\`intraclass_corr()\` -> Type \`ICC2\`)
+- **Secondary Engine**: Python 3.10+ with NumPy/SciPy. SciPy supplies independently maintained F/normal distributions; this suite does not claim to execute Pingouin.
 
 ## 2. Statistical Model Mapping & Verification
-| Statistical Concept | McGraw & Wong (1996) | Shrout & Fleiss (1979) | R \`irr::icc\` | R \`psych::ICC\` | Python \`pingouin\` |
+| Statistical Concept | McGraw & Wong (1996) | Shrout & Fleiss (1979) | R \`irr::icc\` | R \`psych::ICC\` | Python validation |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| **Model Type** | Two-way Mixed Effects | Two-way Random / Mixed | \`model = "twoway"\` | \`ICC2\` / \`ICC3\` | \`ICC2\` / \`ICC3\` |
-| **Agreement Type** | Absolute Agreement | Absolute Agreement | \`type = "agreement"\` | Row \`ICC2\` | Row \`ICC2\` |
+| **Model Type** | Two-way random effects | Two-way random | \`model = "twoway"\` | \`ICC2\` | Two-way random |
+| **Agreement Type** | Absolute Agreement | Absolute Agreement | \`type = "agreement"\` | Row \`ICC2\` | Absolute agreement |
 | **Measure Type** | Single Measure | Single ($k=1$) | \`unit = "single"\` | Single | Single |
-| **Notation** | **ICC(A,1)** | **ICC(2,1)** | **ICC(twoway, agreement, single)** | **ICC2 (Single_random_raters)** | **ICC2 (Two-way random single)** |
+| **Notation** | **ICC(A,1)** | **ICC(2,1)** | **ICC(twoway, agreement, single)** | **ICC2 (Single_random_raters)** | **ICC(A,1)** |
 
 > **Critical Theoretical Distinction**:
 > - **McGraw & Wong (1996) ICC(A,1)** incorporates column variance ($MS_C$, session systematic bias) into the denominator.
-> - **Shrout & Fleiss (1979) ICC(3,1)** is a **consistency** model (it explicitly drops $MS_C$). In \`psych\` and \`pingouin\`, row \`ICC3\` represents **Consistency**, NOT Absolute Agreement.
-> - Therefore, \`ICC(A,1)\` strictly maps to **\`ICC2\`** in \`psych\` and \`pingouin\` (and \`type="agreement"\` in \`irr\`).
+> - **Shrout & Fleiss (1979) ICC(3,1)** is a **consistency** model (it explicitly drops $MS_C$). In \`psych\`, row \`ICC3\` represents **Consistency**, NOT Absolute Agreement.
+> - Therefore, \`ICC(A,1)\` maps to **\`ICC2\`** in \`psych\` (and \`type="agreement"\` in \`irr\`).
 
 ## 3. Global Maximum Absolute Differences
 - **ICC Point Estimate Max Difference**: \`${maxDiffIcc.toExponential(4)}\`
+- **ICC 95% CI Lower Max Difference**: \`${maxDiffIccLower.toExponential(4)}\`
+- **ICC 95% CI Upper Max Difference**: \`${maxDiffIccUpper.toExponential(4)}\`
 - **Typical Error (TE) Max Difference**: \`${maxDiffTe.toExponential(4)}\`
 - **CV% Max Difference**: \`${maxDiffCv.toExponential(4)}\`
 - **SEM Max Difference**: \`${maxDiffSem.toExponential(4)}\`
@@ -149,4 +168,9 @@ Each Gold Standard dataset is archived under \`validation/datasets/<dataset-id>/
 
 fs.writeFileSync(path.join(RESULTS_DIR, 'README.md'), mdContent, 'utf-8');
 
-console.log('Successfully generated validation_summary.json and validation README.md');
+if (!report.validation_passed) {
+  console.error('Cross-validation failed: at least one metric exceeded tolerance or was missing.');
+  process.exitCode = 1;
+} else {
+  console.log('Cross-validation passed for all datasets, including ICC 95% confidence limits.');
+}

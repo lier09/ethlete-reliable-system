@@ -22,8 +22,8 @@ export interface GoldStandardDataset {
     cvMean: number; // CV%
     pooledSD: number;
     iccA1: number; // ICC(A,1)
-    iccA1Lower95?: number;
-    iccA1Upper95?: number;
+    iccA1Lower95: number;
+    iccA1Upper95: number;
     iccC1?: number;
     sem: number;
     mdc95: number;
@@ -476,6 +476,22 @@ export function validateDatasetAgainstGoldStandard(dataset: GoldStandardDataset)
       diff: Math.abs(actual.iccA1 - dataset.expected.iccA1),
       tolerance: dataset.tolerance.icc,
       passed: Math.abs(actual.iccA1 - dataset.expected.iccA1) <= dataset.tolerance.icc
+    },
+    {
+      metric: 'iccA1Lower95',
+      expected: dataset.expected.iccA1Lower95,
+      actual: actual.iccA1Lower95,
+      diff: Math.abs(actual.iccA1Lower95 - dataset.expected.iccA1Lower95),
+      tolerance: dataset.tolerance.icc,
+      passed: Math.abs(actual.iccA1Lower95 - dataset.expected.iccA1Lower95) <= dataset.tolerance.icc
+    },
+    {
+      metric: 'iccA1Upper95',
+      expected: dataset.expected.iccA1Upper95,
+      actual: actual.iccA1Upper95,
+      diff: Math.abs(actual.iccA1Upper95 - dataset.expected.iccA1Upper95),
+      tolerance: dataset.tolerance.icc,
+      passed: Math.abs(actual.iccA1Upper95 - dataset.expected.iccA1Upper95) <= dataset.tolerance.icc
     },
     {
       metric: 'sem',

@@ -299,7 +299,7 @@ export const OverviewView: React.FC<Props> = ({
               </div>
               <div className="flex items-center gap-2">
                 <CheckCircle2 className="w-3.5 h-3.5 text-blue-600 shrink-0" />
-                <span>McGraw & Wong (1996) 双因素混合 ICC(A,1)</span>
+                <span>McGraw & Wong (1996) 双因素随机绝对一致性 ICC(A,1)</span>
               </div>
               <div className="flex items-center gap-2">
                 <CheckCircle2 className="w-3.5 h-3.5 text-blue-600 shrink-0" />
