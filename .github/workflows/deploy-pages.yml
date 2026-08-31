@@ -3,6 +3,7 @@ name: Deploy light app to GitHub Pages
 on:
   push:
     branches:
+      - main
       - codex/light-ui-refresh
   workflow_dispatch:
 
