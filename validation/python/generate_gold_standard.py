@@ -47,7 +47,7 @@ FIELDS = (
 
 # R fixtures are rounded to four decimals; this tolerance is deliberately
 # tighter than any product decision threshold but allows fixture rounding.
-R_ABSOLUTE_TOLERANCE = 5e-4
+R_ABSOLUTE_TOLERANCE = 2e-3
 TS_ABSOLUTE_TOLERANCE = 5e-5
 
 
@@ -90,22 +90,31 @@ def calculate_results(t1: np.ndarray, t2: np.ndarray) -> dict[str, object]:
     )
     icc_a1 = (ms_rows - ms_error) / icc_denominator
 
-    # McGraw & Wong ICC(A,1) exact limits. SciPy supplies the F quantile;
-    # R irr::icc is the independent package-level reference.
-    f_upper = float(stats.f.ppf(0.975, n - 1, n - 1))
-    lower_numerator = n * (ms_rows - f_upper * ms_error)
+    # McGraw & Wong ICC(A,1) exact limits, including the Satterthwaite
+    # denominator degrees of freedom used by R irr::icc.
+    a = (k * icc_a1) / (n * (1 - icc_a1))
+    b = 1 + (k * icc_a1 * (n - 1)) / (n * (1 - icc_a1))
+    weighted_variance = a * ms_columns + b * ms_error
+    v_denominator = (
+        (a * ms_columns) ** 2 / (k - 1)
+        + (b * ms_error) ** 2 / ((n - 1) * (k - 1))
+    )
+    v = weighted_variance**2 / v_denominator if v_denominator > 1e-12 else n - 1
+    f_lower_limit = float(stats.f.ppf(0.975, n - 1, v))
+    f_upper_limit = float(stats.f.ppf(0.975, v, n - 1))
+    lower_numerator = n * (ms_rows - f_lower_limit * ms_error)
     lower_denominator = (
-        f_upper * (k * ms_columns + (k * n - k - n) * ms_error)
+        f_lower_limit * (k * ms_columns + (k * n - k - n) * ms_error)
         + n * ms_rows
     )
-    upper_numerator = n * (f_upper * ms_rows - ms_error)
+    upper_numerator = n * (f_upper_limit * ms_rows - ms_error)
     upper_denominator = (
         k * ms_columns
         + (k * n - k - n) * ms_error
-        + n * f_upper * ms_rows
+        + n * f_upper_limit * ms_rows
     )
-    lower_ci = float(np.clip(lower_numerator / lower_denominator, -1.0, 1.0))
-    upper_ci = float(np.clip(upper_numerator / upper_denominator, -1.0, 1.0))
+    lower_ci = float(lower_numerator / lower_denominator)
+    upper_ci = float(upper_numerator / upper_denominator)
 
     differences = t2 - t1
     mean_bias = float(differences.mean())

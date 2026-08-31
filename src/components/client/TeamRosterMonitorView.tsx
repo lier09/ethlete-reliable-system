@@ -126,7 +126,7 @@ export const TeamRosterMonitorView: React.FC<Props> = ({
         {/* True Improvement Card */}
         <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-xs border-l-4 border-l-emerald-500">
           <div className="text-xs font-bold text-emerald-600 uppercase tracking-wider mb-1 flex items-center justify-between">
-            <span>🟢 突破测试误差提升</span>
+            <span className="inline-flex items-center gap-1.5"><CheckCircle2 className="h-3.5 w-3.5" />突破测试误差提升</span>
             <span className="text-xs font-mono">{formatNum(stats.gainRate, 0)}%</span>
           </div>
           <div className="text-3xl font-bold font-mono text-emerald-700">
@@ -140,7 +140,7 @@ export const TeamRosterMonitorView: React.FC<Props> = ({
         {/* Within Noise Card */}
         <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-xs border-l-4 border-l-slate-400">
           <div className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1 flex items-center justify-between">
-            <span>⚪ 正常测试波动 (在噪声内)</span>
+            <span className="inline-flex items-center gap-1.5"><MinusCircle className="h-3.5 w-3.5" />正常测试波动 (在噪声内)</span>
           </div>
           <div className="text-3xl font-bold font-mono text-slate-700">
             {stats.noise} <span className="text-sm font-normal text-slate-400 font-sans">人</span>
@@ -153,7 +153,7 @@ export const TeamRosterMonitorView: React.FC<Props> = ({
         {/* True Decline Card */}
         <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-xs border-l-4 border-l-rose-500">
           <div className="text-xs font-bold text-rose-600 uppercase tracking-wider mb-1 flex items-center justify-between">
-            <span>🔴 真实超出误差下降</span>
+            <span className="inline-flex items-center gap-1.5"><AlertTriangle className="h-3.5 w-3.5" />真实超出误差下降</span>
             <span className="text-xs font-mono">{formatNum(stats.declineRate, 0)}%</span>
           </div>
           <div className="text-3xl font-bold font-mono text-rose-700">
@@ -199,7 +199,7 @@ export const TeamRosterMonitorView: React.FC<Props> = ({
                 : 'text-slate-600 hover:text-emerald-700'
             }`}
           >
-            🟢 突破提升 ({stats.improvements})
+            <CheckCircle2 className="mr-1 inline h-3 w-3" />突破提升 ({stats.improvements})
           </button>
           <button
             onClick={() => setStatusFilter('within_noise')}
@@ -209,7 +209,7 @@ export const TeamRosterMonitorView: React.FC<Props> = ({
                 : 'text-slate-600 hover:text-slate-900'
             }`}
           >
-            ⚪ 正常波动 ({stats.noise})
+            <MinusCircle className="mr-1 inline h-3 w-3" />正常波动 ({stats.noise})
           </button>
           <button
             onClick={() => setStatusFilter('true_decline')}
@@ -219,7 +219,7 @@ export const TeamRosterMonitorView: React.FC<Props> = ({
                 : 'text-slate-600 hover:text-rose-700'
             }`}
           >
-            🔴 真实下降 ({stats.declines})
+            <AlertTriangle className="mr-1 inline h-3 w-3" />真实下降 ({stats.declines})
           </button>
         </div>
 

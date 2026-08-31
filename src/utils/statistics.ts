@@ -237,8 +237,8 @@ export function fCDF(f: number, df1: number, df2: number): number {
  */
 export function getFQuantile(df1: number, df2: number, p: number): number {
   if (df1 <= 0 || df2 <= 0) return 1.0;
-  if (p <= 0.0001) p = 0.0001;
-  if (p >= 0.9999) p = 0.9999;
+  if (p <= 0) return 0;
+  if (p >= 1) return Number.POSITIVE_INFINITY;
 
   // Paulson's approximation
   const z = normalQuantile(p);
@@ -251,13 +251,19 @@ export function getFQuantile(df1: number, df2: number, p: number): number {
   const denom = h2 * h2 - d2 * z * z;
   let fInit = denom > 0 ? Math.pow(Math.max(0.01, (term1 + term2) / denom), 3) : 1.0;
 
-  // Bisection refinement
-  let low = Math.max(0.0001, fInit * 0.2);
-  let high = Math.max(10.0, fInit * 3.0);
-  for (let i = 0; i < 25; i++) {
+  // Bracket the quantile before bisection. ICC(A,1) confidence intervals can
+  // produce fractional Satterthwaite df and very large F quantiles, so a
+  // fixed upper bound (for example 10) is not sufficient.
+  let low = 0;
+  let high = Math.max(1, fInit * 2);
+  for (let i = 0; i < 80 && fCDF(high, df1, df2) < p; i++) {
+    high *= 2;
+  }
+
+  for (let i = 0; i < 100; i++) {
     const mid = (low + high) / 2;
     const cdf = fCDF(mid, df1, df2);
-    if (Math.abs(cdf - p) < 1e-7) {
+    if (Math.abs(cdf - p) < 1e-10) {
       return mid;
     }
     if (cdf < p) {
@@ -605,10 +611,21 @@ export function calculateICC(
   iccC1Lower95 = Math.max(-1, Math.min(1, iccC1Lower95));
   iccC1Upper95 = Math.max(-1, Math.min(1, iccC1Upper95));
 
-  // ICC(A,1) exact bounds (McGraw & Wong 1996, Formula 8 & 11)
-  // For k=2, dfRow = n-1, dfCol = 1, dfError = n-1:
-  const f1 = fUpper;
-  const f2 = fUpper;
+  // ICC(A,1) exact bounds (McGraw & Wong 1996), matching
+  // irr::icc(model="twoway", type="agreement", unit="single").
+  // The denominator degrees of freedom depend on the observed ICC and
+  // both the column and residual mean squares; they are not simply n - 1.
+  const a = (k * iccA1) / (n * (1 - iccA1));
+  const b = 1 + (k * iccA1 * (n - 1)) / (n * (1 - iccA1));
+  const weightedVariance = a * msCols + b * msError;
+  const vDenominator =
+    (a * msCols) ** 2 / (k - 1) +
+    (b * msError) ** 2 / ((n - 1) * (k - 1));
+  const v = vDenominator > 1e-12
+    ? (weightedVariance ** 2) / vDenominator
+    : n - 1;
+  const f1 = getFQuantile(n - 1, v, 1 - alpha / 2);
+  const f2 = getFQuantile(v, n - 1, 1 - alpha / 2);
 
   const numL = n * (msRows - f1 * msError);
   const denL = f1 * (k * msCols + (k * n - k - n) * msError) + n * msRows;
@@ -618,9 +635,8 @@ export function calculateICC(
   const denU = (k * msCols + (k * n - k - n) * msError) + n * f2 * msRows;
   let iccA1Upper95 = denU > 1e-12 ? numU / denU : iccC1Upper95;
 
-  // Allow negative lower bounds, bounded strictly within [-1, 1]
-  iccA1Lower95 = Math.max(-1, Math.min(1, iccA1Lower95));
-  iccA1Upper95 = Math.max(-1, Math.min(1, iccA1Upper95));
+  // Keep the package-equivalent exact limits. In unstable/negative-ICC
+  // datasets irr can legitimately report a lower confidence limit below -1.
 
   if (iccA1Lower95 > iccA1Upper95) {
     const tmp = iccA1Lower95;

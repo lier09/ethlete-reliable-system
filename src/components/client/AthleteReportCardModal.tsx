@@ -29,7 +29,7 @@ export const AthleteReportCardModal: React.FC<Props> = ({ record, onClose }) => 
     <div className="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
       <div className="bg-white rounded-2xl max-w-lg w-full shadow-2xl border border-slate-200 overflow-hidden animate-scale-in">
         {/* Header */}
-        <div className="bg-slate-900 text-white p-5 flex items-center justify-between">
+        <div className="bg-linear-to-r from-white to-blue-50 text-slate-950 p-5 flex items-center justify-between border-b border-blue-100">
           <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center font-bold text-xs">
               STR
@@ -38,14 +38,14 @@ export const AthleteReportCardModal: React.FC<Props> = ({ record, onClose }) => 
               <h3 className="text-sm font-bold leading-tight">
                 运动员机能评定与真实变化反馈卡
               </h3>
-              <p className="text-[10px] text-slate-400 font-mono">
+              <p className="text-[10px] text-slate-500 font-mono">
                 Athlete Performance & True Change Report
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="w-8 h-8 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center justify-center transition"
+            className="w-8 h-8 rounded-full bg-white hover:bg-blue-100 text-slate-600 flex items-center justify-center transition border border-slate-200"
           >
             <X className="w-4 h-4" />
           </button>

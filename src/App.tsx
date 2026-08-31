@@ -155,7 +155,7 @@ export default function App() {
           onOpenHelp={() => setIsHelpOpen(true)}
         />
       ) : (
-        <div className="flex h-screen w-screen overflow-hidden bg-slate-100 font-sans text-slate-900 antialiased">
+        <div className="app-canvas flex h-screen w-screen overflow-hidden font-sans text-slate-900 antialiased">
           {/* Sidebar */}
           <Sidebar
             activeTab={activeTab}
@@ -180,8 +180,37 @@ export default function App() {
               onSwitchPortal={() => setPortalMode('client')}
             />
 
+            <nav
+              aria-label="移动端科研控制台导航"
+              className="lg:hidden shrink-0 overflow-x-auto border-b border-blue-100 bg-white/92 px-3 py-2 backdrop-blur-xl"
+            >
+              <div className="flex min-w-max items-center gap-1.5">
+                {([
+                  ['overview', '总览'],
+                  ['lab', '可靠性实验室'],
+                  ['monitor', '运动员监控'],
+                  ['references', '基准库'],
+                  ['projects', '项目'],
+                  ['testing', '自动化校验'],
+                  ['settings', '设置']
+                ] as Array<[NavTab, string]>).map(([tab, label]) => (
+                  <button
+                    key={tab}
+                    onClick={() => setActiveTab(tab)}
+                    className={`rounded-lg px-3 py-1.5 text-xs font-semibold whitespace-nowrap ${
+                      activeTab === tab
+                        ? 'bg-blue-600 text-white shadow-xs'
+                        : 'border border-slate-200 bg-white text-slate-600 hover:border-blue-200 hover:bg-blue-50 hover:text-blue-900'
+                    }`}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+            </nav>
+
             {/* Dynamic Page Content */}
-            <main className="flex-1 overflow-y-auto p-6">
+            <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
               {activeTab === 'overview' && (
                 <OverviewView
                   projects={projects}

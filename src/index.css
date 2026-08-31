@@ -1,12 +1,28 @@
 @import "tailwindcss";
 
+:root {
+  --color-primary: #1e40af;
+  --color-secondary: #3b82f6;
+  --color-accent: #d97706;
+  --color-background: #f8fafc;
+  --color-card: #ffffff;
+  --color-foreground: #172554;
+  --color-muted: #e9eef6;
+  --color-muted-foreground: #475569;
+  --color-border: #dbeafe;
+  --color-ring: #1e40af;
+}
+
 @layer base {
   * {
     border-color: rgba(226, 232, 240, 0.85);
   }
 
   body {
-    background-color: #F8FAFC;
+    min-width: 320px;
+    background:
+      radial-gradient(circle at 8% 0%, rgba(219, 234, 254, 0.72), transparent 30rem),
+      linear-gradient(180deg, #f8fbff 0%, #f6f8fc 42%, #f8fafc 100%);
     color: #0F172A;
     font-feature-settings: "cv02", "cv03", "cv04", "cv11", "tnum";
     -webkit-font-smoothing: antialiased;
@@ -17,6 +33,27 @@
   code, kbd, samp, pre {
     font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
     font-feature-settings: "tnum";
+  }
+
+  button,
+  [role="button"],
+  select {
+    cursor: pointer;
+  }
+
+  button,
+  input,
+  select,
+  textarea,
+  a {
+    transition-property: color, background-color, border-color, box-shadow, opacity, transform;
+    transition-duration: 180ms;
+    transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  :focus-visible {
+    outline: 3px solid rgba(30, 64, 175, 0.28);
+    outline-offset: 2px;
   }
 
   /* Custom Clean Professional Scrollbar */
@@ -40,7 +77,7 @@
 .commercial-card {
   background: #FFFFFF;
   border: 1px solid rgba(226, 232, 240, 0.9);
-  box-shadow: 0 1px 3px 0 rgba(15, 23, 42, 0.04), 0 1px 2px -1px rgba(15, 23, 42, 0.04);
+  box-shadow: 0 1px 3px rgba(30, 64, 175, 0.05), 0 10px 28px -24px rgba(30, 64, 175, 0.3);
 }
 
 .commercial-card-hover {
@@ -58,4 +95,21 @@
 
 .tabular-nums {
   font-variant-numeric: tabular-nums;
+}
+
+.app-canvas {
+  background:
+    radial-gradient(circle at 100% 0%, rgba(224, 242, 254, 0.72), transparent 28rem),
+    linear-gradient(180deg, rgba(248, 251, 255, 0.96), rgba(246, 248, 252, 0.98));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }

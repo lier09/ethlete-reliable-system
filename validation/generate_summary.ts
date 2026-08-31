@@ -99,7 +99,7 @@ folders.forEach((folder) => {
 
 const report = {
   title: 'Gold Standard Independent Cross-Validation Report',
-  primary_gold_standard: 'R (irr version 0.84.1 & psych version 2.4.3)',
+  primary_gold_standard: 'R 4.6.1 (irr 0.85 & psych 2.6.5)',
   secondary_validation_engine: 'Independent Python NumPy/SciPy implementation (no Pingouin execution claim)',
   typescript_engine: 'TypeScript statistics.ts v1.0.0',
   summary_max_absolute_differences: {
@@ -130,9 +130,9 @@ const mdContent = `# Gold Standard Cross-Validation Evidence & Benchmark Documen
 **Validation status: ${report.validation_passed ? 'PASS' : 'FAIL'}** — all listed metrics, including ICC 95% confidence limits, must remain within the declared tolerances.
 
 ## 1. Primary Gold Standard Environment
-- **Primary Standard**: GNU R Statistical Environment (v4.3+)
-  - \`irr\` (v0.84.1): \`irr::icc(ratings, model = "twoway", type = "agreement", unit = "single", conf.level = 0.95)\`
-  - \`psych\` (v2.4.3): \`psych::ICC(ratings)$results["ICC2", ]\`
+- **Primary Standard**: GNU R Statistical Environment (v4.6.1)
+  - \`irr\` (v0.85): \`irr::icc(ratings, model = "twoway", type = "agreement", unit = "single", conf.level = 0.95)\`
+  - \`psych\` (v2.6.5): \`psych::ICC(ratings)$results["ICC2", ]\`
 - **Secondary Engine**: Python 3.10+ with NumPy/SciPy. SciPy supplies independently maintained F/normal distributions; this suite does not claim to execute Pingouin.
 
 ## 2. Statistical Model Mapping & Verification

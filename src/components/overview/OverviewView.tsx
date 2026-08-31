@@ -85,11 +85,12 @@ export const OverviewView: React.FC<Props> = ({
   return (
     <div className="space-y-6 max-w-7xl mx-auto pb-12">
       {/* Hero Section: Core Problem & System Positioning */}
-      <div className="bg-slate-950 text-white rounded-2xl p-6 sm:p-8 border border-slate-800 shadow-sm relative overflow-hidden">
+      <div className="bg-linear-to-br from-white via-blue-50/70 to-sky-50 rounded-2xl p-6 sm:p-8 border border-blue-100 shadow-[0_18px_50px_-38px_rgba(30,64,175,0.6)] relative overflow-hidden">
+        <div className="absolute -right-24 -top-28 h-72 w-72 rounded-full bg-blue-200/35 blur-3xl" aria-hidden="true" />
         <div className="relative z-10 space-y-5">
           {/* Header pill badge & Action button */}
           <div className="flex flex-wrap items-center justify-between gap-3">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 text-blue-400 text-xs font-semibold border border-blue-500/20">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/80 text-blue-800 text-xs font-semibold border border-blue-200 shadow-xs">
               <ShieldCheck className="w-3.5 h-3.5" />
               <span>Sports Test Reliability & True Change Identification Suite</span>
             </div>
@@ -97,9 +98,9 @@ export const OverviewView: React.FC<Props> = ({
             <div className="flex items-center gap-2">
               <button
                 onClick={onOpenHelp}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-200 text-xs font-medium border border-slate-700 transition"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white hover:bg-blue-50 text-slate-700 text-xs font-medium border border-slate-200 hover:border-blue-200 transition"
               >
-                <HelpCircle className="w-3.5 h-3.5 text-blue-400" />
+                <HelpCircle className="w-3.5 h-3.5 text-blue-600" />
                 方法学规范白皮书
               </button>
               <button
@@ -114,13 +115,13 @@ export const OverviewView: React.FC<Props> = ({
 
           {/* Core Question Headline */}
           <div className="space-y-2 max-w-4xl">
-            <div className="text-xs font-mono tracking-wider uppercase text-blue-400 font-semibold">
+            <div className="text-xs font-mono tracking-wider uppercase text-blue-700 font-semibold">
               体育科学核心问题 | The Fundamental Biomechanics Question
             </div>
-            <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold tracking-tight text-white leading-snug">
+            <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold tracking-tight text-slate-950 leading-snug">
               运动员某项测试成绩提高了，究竟是真正的机能提升，还是仅仅是测试的正常波动？
             </h1>
-            <p className="text-xs sm:text-sm text-slate-400 leading-relaxed max-w-3xl">
+            <p className="text-xs sm:text-sm text-slate-600 leading-relaxed max-w-3xl">
               本系统严格遵循体育科学计量学（Shaw et al., 2026; Hopkins, 2000; Weir, 2005）标准，
               通过<strong>群体重复测试（Cohort Test–Retest）</strong>量化测量误差并固化为 <strong>Reference 基准</strong>，
               进而精准判定<strong>单个运动员（Individual Athlete）</strong>的测试变化是否突破 <strong>MDC95 误差带</strong>。
@@ -129,28 +130,28 @@ export const OverviewView: React.FC<Props> = ({
 
           {/* Quick Metrics Bar */}
           <div className="pt-2 grid grid-cols-2 sm:grid-cols-4 gap-3">
-            <div className="bg-slate-900/80 border border-slate-800 p-3 rounded-xl">
-              <div className="text-[11px] text-slate-400 font-medium">活跃 Reference 基准</div>
-              <div className="text-xl font-bold text-white font-mono mt-0.5">{activeRefs.length} 项</div>
-              <div className="text-[10px] text-slate-500 mt-0.5">CMJ / RSI-mod / 冲刺</div>
+            <div className="bg-white/85 border border-blue-100 p-3 rounded-xl shadow-xs">
+              <div className="text-[11px] text-slate-500 font-medium">活跃 Reference 基准</div>
+              <div className="text-xl font-bold text-slate-950 font-mono mt-0.5">{activeRefs.length} 项</div>
+              <div className="text-[10px] text-slate-400 mt-0.5">CMJ / RSI-mod / 冲刺</div>
             </div>
 
-            <div className="bg-slate-900/80 border border-slate-800 p-3 rounded-xl">
-              <div className="text-[11px] text-slate-400 font-medium">科研分析项目</div>
-              <div className="text-xl font-bold text-blue-400 font-mono mt-0.5">{projects.length} 个</div>
-              <div className="text-[10px] text-slate-500 mt-0.5">多试次聚合与方差分解</div>
+            <div className="bg-white/85 border border-blue-100 p-3 rounded-xl shadow-xs">
+              <div className="text-[11px] text-slate-500 font-medium">科研分析项目</div>
+              <div className="text-xl font-bold text-blue-700 font-mono mt-0.5">{projects.length} 个</div>
+              <div className="text-[10px] text-slate-400 mt-0.5">多试次聚合与方差分解</div>
             </div>
 
-            <div className="bg-slate-900/80 border border-slate-800 p-3 rounded-xl">
-              <div className="text-[11px] text-slate-400 font-medium">已记录运动员追踪</div>
-              <div className="text-xl font-bold text-emerald-400 font-mono mt-0.5">{monitorRecords.length} 次</div>
-              <div className="text-[10px] text-slate-500 mt-0.5">MDC 误差带纵向判定</div>
+            <div className="bg-white/85 border border-blue-100 p-3 rounded-xl shadow-xs">
+              <div className="text-[11px] text-slate-500 font-medium">已记录运动员追踪</div>
+              <div className="text-xl font-bold text-emerald-700 font-mono mt-0.5">{monitorRecords.length} 次</div>
+              <div className="text-[10px] text-slate-400 mt-0.5">MDC 误差带纵向判定</div>
             </div>
 
-            <div className="bg-slate-900/80 border border-slate-800 p-3 rounded-xl">
-              <div className="text-[11px] text-slate-400 font-medium">自动化公式校验</div>
-              <div className="text-xl font-bold text-indigo-400 font-mono mt-0.5">18/18</div>
-              <div className="text-[10px] text-slate-500 mt-0.5">100% 数学断言通过</div>
+            <div className="bg-white/85 border border-blue-100 p-3 rounded-xl shadow-xs">
+              <div className="text-[11px] text-slate-500 font-medium">自动化公式校验</div>
+              <div className="text-xl font-bold text-indigo-700 font-mono mt-0.5">18/18</div>
+              <div className="text-[10px] text-slate-400 mt-0.5">100% 数学断言通过</div>
             </div>
           </div>
         </div>

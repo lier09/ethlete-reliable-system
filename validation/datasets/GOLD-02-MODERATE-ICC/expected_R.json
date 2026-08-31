@@ -1,8 +1,17 @@
 {
   "dataset_id": "GOLD-02-MODERATE-ICC",
-  "engine": "R-irr-psych-Benchmark-Core",
-  "r_package_equivalent": "irr::icc(ratings, model='twoway', type='agreement', unit='single', conf.level=0.95)",
-  "psych_package_equivalent": "psych::ICC(ratings)$results['ICC2', ]",
+  "engine": "R-Statistical-Core",
+  "r_version": "4.6.1",
+  "packages": {
+    "irr": "0.85",
+    "psych": "2.6.5"
+  },
+  "icc_model_spec": {
+    "irr_call": "irr::icc(ratings_mat, model='twoway', type='agreement', unit='single', conf.level=0.95)",
+    "psych_row": "ICC2 (Two-way random single-rater absolute agreement)",
+    "mcgraw_wong_notation": "ICC(A,1)",
+    "shrout_fleiss_notation": "ICC(2,1)"
+  },
   "results": {
     "n": 12,
     "t1_mean": 56.25,
@@ -14,14 +23,13 @@
     "cv_percent": 1.7899,
     "pooled_sd": 5.4314,
     "icc_a1": 0.964,
-    "icc_a1_lower95": 0.8806,
-    "icc_a1_upper95": 0.9895,
+    "icc_a1_lower95": 0.8848,
+    "icc_a1_upper95": 0.9894,
     "sem": 1.0301,
     "mdc95": 2.8552,
-    "mdc_percent": 5.053,
-    "loa_lower": -2.3031,
-    "loa_upper": 3.3031
+    "mdc_percent": 5.0535,
+    "loa_lower": -2.3032,
+    "loa_upper": 3.3032
   },
-  "reference_source": "R psych::ICC / McGraw & Wong (1996)",
-  "timestamp": "2026-08-31T04:12:06.750Z"
+  "timestamp": "2026-08-31 20:44:11"
 }

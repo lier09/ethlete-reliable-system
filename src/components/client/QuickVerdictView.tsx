@@ -156,44 +156,44 @@ export const QuickVerdictView: React.FC<Props> = ({
   return (
     <div className="space-y-6 max-w-7xl mx-auto pb-16">
       {/* Top Banner: Sports Field Context */}
-      <div className="bg-linear-to-r from-slate-900 via-blue-950 to-slate-900 rounded-2xl p-6 text-white shadow-lg border border-slate-800 flex flex-wrap items-center justify-between gap-6">
+      <div className="bg-linear-to-br from-white via-blue-50/80 to-sky-50 rounded-2xl p-6 shadow-[0_18px_50px_-38px_rgba(30,64,175,0.6)] border border-blue-100 flex flex-wrap items-center justify-between gap-6">
         <div className="space-y-1.5 max-w-2xl">
-          <div className="inline-flex items-center gap-2 px-3 py-1 bg-blue-500/20 text-blue-300 rounded-full text-xs font-semibold tracking-wide border border-blue-400/30">
-            <Zap className="w-3.5 h-3.5 text-blue-400" />
+          <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/90 text-blue-800 rounded-full text-xs font-semibold tracking-wide border border-blue-200 shadow-xs">
+            <Zap className="w-3.5 h-3.5 text-blue-600" />
             实战教练端 · 极速真实变化判定
           </div>
-          <h2 className="text-2xl font-black tracking-tight text-white">
+          <h2 className="text-2xl font-black tracking-tight text-slate-950">
             运动员个体真实变化判定仪 (True Change Evaluator)
           </h2>
-          <p className="text-xs text-slate-300 leading-relaxed">
-            输入运动员的前后测成绩，系统将基于经科学标定的 <strong className="text-blue-300 font-mono">MDC₉₅ 测量误差阈值</strong>，自动过滤测试噪声与测量误差，判定是否发生**真实提升**、**正常波动**或**真实超出误差下降**。
+          <p className="text-xs text-slate-600 leading-relaxed">
+            输入运动员的前后测成绩，系统将基于经科学标定的 <strong className="text-blue-800 font-mono">MDC₉₅ 测量误差阈值</strong>，自动过滤测试噪声与测量误差，判定是否发生<strong>可检测升高</strong>、<strong>正常波动</strong>或<strong>可检测下降</strong>。
           </p>
         </div>
 
         {/* Quick Presets */}
-        <div className="flex flex-col gap-2 bg-slate-800/80 p-3.5 rounded-xl border border-slate-700/60">
-          <span className="text-[11px] font-bold text-slate-300 flex items-center gap-1.5">
-            <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+        <div className="flex flex-col gap-2 bg-white/90 p-3.5 rounded-xl border border-blue-100 shadow-xs">
+          <span className="text-[11px] font-bold text-slate-600 flex items-center gap-1.5">
+            <Sparkles className="w-3.5 h-3.5 text-amber-600" />
             快速示范案例：
           </span>
           <div className="flex items-center gap-2">
             <button
               onClick={() => handleLoadPreset('gain')}
-              className="px-2.5 py-1 bg-emerald-950/80 hover:bg-emerald-900 text-emerald-300 border border-emerald-700/50 rounded-lg text-xs font-medium transition"
+              className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 rounded-lg text-xs font-medium transition"
             >
-              🟢 真实突破提升
+              <CheckCircle2 className="w-3 h-3" /> 可检测升高
             </button>
             <button
               onClick={() => handleLoadPreset('noise')}
-              className="px-2.5 py-1 bg-slate-700/80 hover:bg-slate-700 text-slate-200 border border-slate-600 rounded-lg text-xs font-medium transition"
+              className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 rounded-lg text-xs font-medium transition"
             >
-              ⚪ 正常测试波动
+              <MinusCircle className="w-3 h-3" /> 正常测试波动
             </button>
             <button
               onClick={() => handleLoadPreset('drop')}
-              className="px-2.5 py-1 bg-rose-950/80 hover:bg-rose-900 text-rose-300 border border-rose-700/50 rounded-lg text-xs font-medium transition"
+              className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-rose-50 hover:bg-rose-100 text-rose-800 border border-rose-200 rounded-lg text-xs font-medium transition"
             >
-              🔴 真实超出误差下降
+              <AlertTriangle className="w-3 h-3" /> 可检测下降
             </button>
           </div>
         </div>
@@ -396,10 +396,10 @@ export const QuickVerdictView: React.FC<Props> = ({
               <div
                 className={`rounded-2xl p-6 border shadow-md transition-all ${
                   evalResult.resultType === 'true_improvement'
-                    ? 'bg-linear-to-br from-emerald-900 via-emerald-950 to-slate-950 text-white border-emerald-700/60 shadow-emerald-950/20'
+                    ? 'bg-linear-to-br from-white to-emerald-50 text-emerald-950 border-emerald-200 shadow-emerald-900/8'
                     : evalResult.resultType === 'true_decline'
-                    ? 'bg-linear-to-br from-rose-900 via-rose-950 to-slate-950 text-white border-rose-700/60 shadow-rose-950/20'
-                    : 'bg-linear-to-br from-slate-800 via-slate-900 to-slate-950 text-white border-slate-700 shadow-slate-900/20'
+                    ? 'bg-linear-to-br from-white to-rose-50 text-rose-950 border-rose-200 shadow-rose-900/8'
+                    : 'bg-linear-to-br from-white to-slate-50 text-slate-950 border-slate-200 shadow-slate-900/8'
                 }`}
               >
                 <div className="flex items-start justify-between gap-4">
@@ -414,7 +414,7 @@ export const QuickVerdictView: React.FC<Props> = ({
                             : 'bg-slate-400'
                         }`}
                       ></span>
-                      <span className="text-xs font-mono uppercase tracking-widest text-slate-300">
+                      <span className="text-xs font-mono uppercase tracking-widest text-slate-500">
                         实时判定结论 (Real-Time Verdict)
                       </span>
                     </div>
@@ -424,7 +424,7 @@ export const QuickVerdictView: React.FC<Props> = ({
                   </div>
 
                   <div className="text-right">
-                    <div className="text-[10px] text-slate-400 uppercase font-mono">变化幅度 (Delta)</div>
+                    <div className="text-[10px] text-slate-500 uppercase font-mono">变化幅度 (Delta)</div>
                     <div className="text-2xl font-black font-mono mt-0.5">
                       {evalResult.delta >= 0 ? '+' : ''}
                       {formatNum(evalResult.delta, 2)}{' '}
@@ -438,14 +438,14 @@ export const QuickVerdictView: React.FC<Props> = ({
                 </div>
 
                 {/* Plain-Language Explanation */}
-                <div className="mt-4 p-4 rounded-xl bg-black/30 border border-white/10 text-xs leading-relaxed space-y-2">
-                  <p className="text-slate-200">
-                    <strong className="text-white">科学结论：</strong> {evalResult.resultExplanation}
+                <div className="mt-4 p-4 rounded-xl bg-white/75 border border-slate-200 text-xs leading-relaxed space-y-2">
+                  <p className="text-slate-700">
+                    <strong className="text-slate-950">科学结论：</strong> {evalResult.resultExplanation}
                   </p>
-                  <p className="text-slate-400 text-[11px]">
+                  <p className="text-slate-600 text-[11px]">
                     该动作的 95% 最小真实变化阈值为{' '}
-                    <strong className="text-blue-300 font-mono">±{formatNum(evalResult.mdc95, 2)} {evalResult.unit}</strong>
-                    。当前变化量 <strong className="text-white font-mono">{formatNum(Math.abs(evalResult.delta), 2)} {evalResult.unit}</strong>{' '}
+                    <strong className="text-blue-800 font-mono">±{formatNum(evalResult.mdc95, 2)} {evalResult.unit}</strong>
+                    。当前变化量 <strong className="text-slate-950 font-mono">{formatNum(Math.abs(evalResult.delta), 2)} {evalResult.unit}</strong>{' '}
                     {Math.abs(evalResult.delta) >= evalResult.mdc95
                       ? '已超过测量误差，有 95% 置信度代表真实机能状态改变。'
                       : '位于测量噪声范围内，属日常正常生理/仪器波动。'}
@@ -522,17 +522,17 @@ export const QuickVerdictView: React.FC<Props> = ({
                   <div className="text-xs text-blue-950 leading-relaxed">
                     {evalResult.resultType === 'true_improvement' && (
                       <p>
-                        🟢 <strong>可检测升高确认：</strong> 实测表现已超出 95% 最小可检测变化阈值 (MDC₉₅)，确认为突破测试误差的可检测升高。超过MDC仅表示观察到的变化超过预期测量误差，不说明变化的生理或训练原因。
+                        <CheckCircle2 className="mr-1 inline h-3.5 w-3.5 text-emerald-600" /> <strong>可检测升高确认：</strong> 实测表现已超出 95% 最小可检测变化阈值 (MDC₉₅)，确认为突破测试误差的可检测升高。超过MDC仅表示观察到的变化超过预期测量误差，不说明变化的生理或训练原因。
                       </p>
                     )}
                     {evalResult.resultType === 'within_noise' && (
                       <p>
-                        ⚪ <strong>正常误差范围：</strong> 表现波动处于预期测量误差带 (±MDC₉₅) 内，属于日常测试与生物学正常随机波动。当前变化未超过预期测量误差阈值。
+                        <MinusCircle className="mr-1 inline h-3.5 w-3.5 text-slate-500" /> <strong>正常误差范围：</strong> 表现波动处于预期测量误差带 (±MDC₉₅) 内，属于日常测试与生物学正常随机波动。当前变化未超过预期测量误差阈值。
                       </p>
                     )}
                     {evalResult.resultType === 'true_decline' && (
                       <p>
-                        🔴 <strong>可检测下降提示：</strong> 检测到超过预期测量误差的可检测下降。超过MDC仅表示观察到的变化超过预期测量误差，不说明变化的生理或训练原因。具体研判需结合训练负荷、RPE自觉评分、睡眠质量与临床评估综合研判。
+                        <AlertTriangle className="mr-1 inline h-3.5 w-3.5 text-rose-600" /> <strong>可检测下降提示：</strong> 检测到超过预期测量误差的可检测下降。超过MDC仅表示观察到的变化超过预期测量误差，不说明变化的生理或训练原因。具体研判需结合训练负荷、RPE自觉评分、睡眠质量与临床评估综合研判。
                       </p>
                     )}
                   </div>

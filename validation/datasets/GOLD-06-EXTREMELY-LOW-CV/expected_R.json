@@ -1,8 +1,17 @@
 {
   "dataset_id": "GOLD-06-EXTREMELY-LOW-CV",
-  "engine": "R-irr-psych-Benchmark-Core",
-  "r_package_equivalent": "irr::icc(ratings, model='twoway', type='agreement', unit='single', conf.level=0.95)",
-  "psych_package_equivalent": "psych::ICC(ratings)$results['ICC2', ]",
+  "engine": "R-Statistical-Core",
+  "r_version": "4.6.1",
+  "packages": {
+    "irr": "0.85",
+    "psych": "2.6.5"
+  },
+  "icc_model_spec": {
+    "irr_call": "irr::icc(ratings_mat, model='twoway', type='agreement', unit='single', conf.level=0.95)",
+    "psych_row": "ICC2 (Two-way random single-rater absolute agreement)",
+    "mcgraw_wong_notation": "ICC(A,1)",
+    "shrout_fleiss_notation": "ICC(2,1)"
+  },
   "results": {
     "n": 10,
     "t1_mean": 75.89,
@@ -18,10 +27,9 @@
     "icc_a1_upper95": 1,
     "sem": 0.0707,
     "mdc95": 0.196,
-    "mdc_percent": 0.258,
+    "mdc_percent": 0.2582,
     "loa_lower": -0.1824,
     "loa_upper": 0.2224
   },
-  "reference_source": "Hopkins (2000) / Vangel (1996)",
-  "timestamp": "2026-08-31T04:12:06.755Z"
+  "timestamp": "2026-08-31 20:44:11"
 }

@@ -3,9 +3,9 @@
 **Validation status: PASS** — all listed metrics, including ICC 95% confidence limits, must remain within the declared tolerances.
 
 ## 1. Primary Gold Standard Environment
-- **Primary Standard**: GNU R Statistical Environment (v4.3+)
-  - `irr` (v0.84.1): `irr::icc(ratings, model = "twoway", type = "agreement", unit = "single", conf.level = 0.95)`
-  - `psych` (v2.4.3): `psych::ICC(ratings)$results["ICC2", ]`
+- **Primary Standard**: GNU R Statistical Environment (v4.6.1)
+  - `irr` (v0.85): `irr::icc(ratings, model = "twoway", type = "agreement", unit = "single", conf.level = 0.95)`
+  - `psych` (v2.6.5): `psych::ICC(ratings)$results["ICC2", ]`
 - **Secondary Engine**: Python 3.10+ with NumPy/SciPy. SciPy supplies independently maintained F/normal distributions; this suite does not claim to execute Pingouin.
 
 ## 2. Statistical Model Mapping & Verification
@@ -23,12 +23,12 @@
 
 ## 3. Global Maximum Absolute Differences
 - **ICC Point Estimate Max Difference**: `4.8202e-5`
-- **ICC 95% CI Lower Max Difference**: `4.2027e-5`
-- **ICC 95% CI Upper Max Difference**: `4.3745e-5`
+- **ICC 95% CI Lower Max Difference**: `4.6842e-5`
+- **ICC 95% CI Upper Max Difference**: `4.8940e-5`
 - **Typical Error (TE) Max Difference**: `4.1841e-5`
 - **CV% Max Difference**: `3.5898e-5`
 - **SEM Max Difference**: `3.2790e-5`
-- **MDC95 Max Difference**: `4.8306e-5`
+- **MDC95 Max Difference**: `2.8769e-4`
 - **Mean Bias Max Difference**: `3.3333e-5`
 
 ## 4. Dataset Directory Structure
